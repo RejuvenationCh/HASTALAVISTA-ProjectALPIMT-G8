@@ -9,8 +9,5 @@ public class OutfixApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(OutfixApplication.class, args);
 	}
-	public static void testFunction() {
-		// Test function implementation
-	}
 
 }

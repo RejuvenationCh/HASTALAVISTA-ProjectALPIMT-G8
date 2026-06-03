@@ -1,0 +1,294 @@
+/* Base Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'SF Pro', sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #000;
+    overflow-x: hidden; 
+}
+
+/* Navbar Styles */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.logo img {
+    height: 100px; /* Reduced slightly to match Figma proportions */
+    width: auto;
+    vertical-align: middle;
+}
+
+/* Centered navigation */
+.nav-links {
+    display: flex;
+    gap: 40px;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 0;
+    transition: color 0.3s ease; 
+}
+
+.nav-links a:hover {
+    color: #666; 
+}
+
+.nav-links span {
+    font-size: 10px;
+    vertical-align: middle;
+    margin-left: 2px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #000;
+}
+
+/* Slider Section */
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 101px); 
+    overflow: hidden;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.slides-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain; 
+    object-position: center; 
+}
+
+/* Slider arrows */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #d3d3d3; 
+    font-size: 50px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+    color: #888;
+}
+
+.prev-btn {
+    left: 40px;
+}
+
+.next-btn {
+    right: 40px;
+}
+
+/* About Section */
+.about-section {
+    position: relative;
+    overflow: hidden; 
+    padding: 120px 20px; /* Gives the section vertical breathing room */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 500px;
+}
+
+.about-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%); 
+    height: 90%; /* Slightly scaled down so it doesn't touch edges */               
+    z-index: 1;                 
+    object-fit: contain;
+}
+
+.left-img {
+    left: -5%;  
+}
+
+.right-img {
+    right: -5%; 
+}
+
+.about-content {
+    position: relative;
+    z-index: 2; 
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Flexbox to align the inline logo with the text */
+.about-content h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+}
+
+/* Styling for the placeholder inline logo */
+.about-logo-inline {
+    height: 54px; /* Matches the h2 font size */
+    width: auto;
+    margin: 0 10px; /* Space between words */
+    object-fit: contain;
+}
+
+.about-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #222;
+    margin-bottom: 50px;
+}
+
+.vision-text {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Footer Section */
+.site-footer {
+    background-color: #1a1a1a; 
+    color: #ffffff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; 
+    max-width: 800px;
+    margin: 0 auto;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.school-logo {
+    height: 200px; 
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1); 
+}
+
+.footer-text p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #888888; 
+    margin-bottom: 12px;
+}
+
+/* ==========================================
+   RESPONSIVE STYLES (Mobile & Tablets)
+   ========================================== */
+@media screen and (max-width: 1024px) {
+    /* Styles inside here apply to screens smaller than 1024px */
+    
+    .navbar {
+        padding: 15px 20px; /* Bring navbar padding in so links don't squash */
+    }
+
+    .nav-links {
+        gap: 20px; /* Reduce space between links */
+    }
+}
+
+@media screen and (max-width: 768px) {
+    /* Styles inside here apply to mobile devices */
+    
+    /* 1. Turn Navbar links into a mobile stack or hide them */
+    .nav-links {
+        position: static;
+        transform: none;
+        gap: 15px;
+        font-size: 12px;
+    }
+    
+    /* 2. Fix the Slider height so it doesn't look stretched on mobile */
+    .slider-container {
+        height: 50vh; /* Shorter slider height for vertical phone screens */
+    }
+    
+    /* 3. FIX THE ABOUT SECTION (Crucial for your layout) */
+    .about-section {
+        flex-direction: column; /* Stack elements vertically instead of horizontally */
+        padding: 60px 20px;
+    }
+
+    .about-img {
+        position: relative; /* Remove from absolute positioning so they don't overlap text */
+        top: 0;
+        transform: none;
+        height: auto;
+        width: 80%; /* Let them take up width instead of height */
+        margin: 20px auto;
+    }
+
+    .left-img { left: 0; }
+    .right-img { right: 0; }
+
+    .about-content h2 {
+        font-size: 32px; /* Shrink giant headings so they don't wrap awkwardly */
+    }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}

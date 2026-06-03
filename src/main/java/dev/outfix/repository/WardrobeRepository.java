@@ -1,5 +1,12 @@
 package dev.outfix.repository;
 
-public class WardrobeRepository {
-    
+import dev.outfix.entity.Wardrobe;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface WardrobeRepository extends JpaRepository<Wardrobe, Long> {
+
+    Optional<Wardrobe> findByUserId(Long userId);
+
 }

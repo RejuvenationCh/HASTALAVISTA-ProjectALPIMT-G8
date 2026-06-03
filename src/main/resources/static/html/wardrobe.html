@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfix - My Wardrobe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="index.html"><img src="../image/LOGO.png" alt="Outfix Logo"></a>
+        </div>
+        
+        <nav class="nav-links">
+            <a href="wardrobe.html" class="active">My Wardrobe</a>
+            <a href="collection.html">Collection</a>
+            <a href="generate.html">Generate</a>
+            <a href="schedule.html">Schedule</a>
+        </nav>
+
+        <div class="nav-actions">
+            <button class="icon-btn" aria-label="Notifications"><i class="fa-regular fa-bell"></i></button> 
+            <button class="icon-btn" aria-label="Profile"><i class="fa-regular fa-user"></i></button> 
+        </div>
+    </header>
+
+    <main class="wardrobe-container">
+        <div class="wardrobe-header">
+            <div class="header-titles">
+                <h1>MY WARDROBE</h1>
+                <p>Manage, categorize, and organize your apparel catalog items.</p>
+            </div>
+            <button id="open-add-modal-btn" class="add-item-trigger-btn" aria-label="Add Clothes">
+                <i class="fa-solid fa-plus"></i> ADD ITEM
+            </button>
+        </div>
+
+        <div class="category-filters">
+            <button class="filter-tab active" data-category="all">All Items</button>
+            <button class="filter-tab" data-category="tops">Tops</button>
+            <button class="filter-tab" data-category="bottoms">Bottoms</button>
+            <button class="filter-tab" data-category="outerwear">Outerwear</button>
+            <button class="filter-tab" data-category="shoes">Shoes</button>
+        </div>
+
+        <div id="wardrobe-grid" class="wardrobe-grid">
+            <div class="empty-state-message" id="empty-state">
+                <p>Your wardrobe container is currently empty. Click the "+" button above to add clothes.</p>
+            </div>
+        </div>
+    </main>
+
+    <div id="add-item-modal" class="modal-overlay">
+        <div class="modal-card wardrobe-modal-card">
+            <button id="close-add-modal-btn" class="modal-close-x" aria-label="Close Window">&times;</button>
+            
+            <div class="auth-header">
+                <h2>ADD NEW APPAREL</h2>
+                <p>Upload a file and define attributes for your apparel asset.</p>
+            </div>
+
+            <form id="add-clothing-form" autocomplete="off">
+                <div class="modal-split-layout">
+                    
+                    <div class="uploader-column">
+                        <label class="form-label">CLOTHES IMAGE</label>
+                        <div class="image-upload-dropzone" id="dropzone-area">
+                            <input type="file" id="clothing-file-input" accept="image/*" required hidden>
+                            <div class="dropzone-prompt" id="dropzone-text">
+                                <i class="fa-regular fa-image upload-icon"></i>
+                                <p>Click to browse files</p>
+                                <span>Supports: JPG, PNG, JPEG</span>
+                            </div>
+                            <img src="" alt="Apparel Upload Preview" id="upload-preview-img" class="upload-preview-hidden">
+                        </div>
+                    </div>
+
+                    <div class="form-inputs-column">
+                        <div class="form-group">
+                            <label for="item-name">CLOTHES NAME</label>
+                            <input type="text" id="item-name" placeholder="e.g., Cropped Leather Bomber Jacket" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-category">CATEGORY TYPE</label>
+                            <select id="item-category" required>
+                                <option value="" disabled selected>Select category group...</option>
+                                <option value="tops">Tops</option>
+                                <option value="bottoms">Bottoms</option>
+                                <option value="outerwear">Outerwear</option>
+                                <option value="shoes">Shoes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="item-color">PRIMARY COLOR</label>
+                            <input type="text" id="item-color" placeholder="e.g., Matte Black" required>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-action-footer">
+                    <button type="button" id="cancel-modal-btn" class="auth-secondary-btn">CANCEL</button>
+                    <button type="submit" class="auth-primary-btn">ADD TO WARDROBE</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

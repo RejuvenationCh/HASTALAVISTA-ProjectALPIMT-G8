@@ -82,9 +82,10 @@ public class ComfyUiService {
      * Generates a full outfit try-on mockup using workflow_full_outfit_template.json.
      * Runs three CatVTON passes in sequence: top → bottom → shoes.
      *
-     * @return the output image filename from ComfyUI, or null on timeout
+     * @return String[2] where [0] = JPG filename, [1] = PNG filename.
+     *         Both are null if the job timed out.
      */
-    public String generateFullOutfit(String faceFilename, String topFilename,
+    public String[] generateFullOutfit(String faceFilename, String topFilename,
             String bottomFilename, String shoesFilename)
             throws IOException, InterruptedException {
 
@@ -94,8 +95,9 @@ public class ComfyUiService {
         String promptId = submitPromptToComfyUi(workflow);
         log.info("Full-outfit job submitted. prompt_id={}", promptId);
 
-        return pollUntilComplete(promptId,
-                props.getNode().getFullOutfitOutputNodeId());
+        return pollForBothOutputs(promptId,
+                props.getNode().getFullOutfitOutputNodeId(),
+                props.getNode().getPngOutputNodeId());
     }
 
     private ObjectNode buildFullOutfitWorkflow(String faceFilename,
@@ -252,6 +254,50 @@ public class ComfyUiService {
         log.warn("ComfyUI render timed out after {} attempts for prompt_id={}",
                 maxAttempts, promptId);
         return null;
+    }
+
+    /**
+     * Like pollUntilComplete but extracts two output filenames from the same job.
+     * Returns String[2]: [0] = JPG filename, [1] = PNG filename.
+     * Both are null if the job timed out.
+     */
+    private String[] pollForBothOutputs(String promptId,
+            String jpgNodeId, String pngNodeId) throws InterruptedException {
+
+        int maxAttempts = props.getPolling().getMaxAttempts();
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++) {
+            Thread.sleep(2000);
+
+            JsonNode history = comfyUiWebClient.get()
+                    .uri("/history/{promptId}", promptId)
+                    .retrieve()
+                    .bodyToMono(JsonNode.class)
+                    .block();
+
+            if (history == null || !history.has(promptId)) {
+                log.debug("Poll {}/{}: job not in history yet.", attempt, maxAttempts);
+                continue;
+            }
+
+            JsonNode jobResult = history.get(promptId);
+            boolean isComplete = jobResult.path("status")
+                    .path("completed").asBoolean(false);
+
+            if (isComplete) {
+                String jpgFilename = extractOutputFilename(jobResult, jpgNodeId);
+                String pngFilename = extractOutputFilename(jobResult, pngNodeId);
+                log.info("Full-outfit render complete. jpg={}, png={}", jpgFilename, pngFilename);
+                return new String[]{ jpgFilename, pngFilename };
+            }
+
+            log.debug("Poll {}/{}: status={}", attempt, maxAttempts,
+                    jobResult.path("status").path("status_str").asText("running"));
+        }
+
+        log.warn("ComfyUI render timed out after {} attempts for prompt_id={}",
+                maxAttempts, promptId);
+        return new String[]{ null, null };
     }
 
     /** Reads the output image filename from the completed job's history entry. */

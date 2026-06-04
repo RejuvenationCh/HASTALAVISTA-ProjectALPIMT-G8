@@ -16,6 +16,13 @@
 @rem SPDX-License-Identifier: Apache-2.0
 @rem
 
+@rem Fix for JDK 21 + Windows: Gradle uses Unix Domain Sockets whose path
+@rem must be short. Setting TEMP before setlocal keeps it in the outer scope
+@rem so it survives endlocal and reaches the JVM's native socket code.
+if not exist "C:\tmp" mkdir "C:\tmp"
+set TEMP=C:\tmp
+set TMP=C:\tmp
+
 @if "%DEBUG%"=="" @echo off
 @rem ##########################################################################
 @rem
@@ -34,6 +41,10 @@ set APP_HOME=%DIRNAME%
 
 @rem Resolve any "." and ".." in APP_HOME to make it shorter.
 for %%i in ("%APP_HOME%") do set APP_HOME=%%~fi
+
+@rem Fix for JDK 21 + Windows: Unix Domain Socket path must be short.
+@rem Without this, Gradle fails with "Unable to establish loopback connection".
+if not exist "C:\tmp" mkdir "C:\tmp"
 
 @rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
 set DEFAULT_JVM_OPTS="-Xmx64m" "-Xms64m"

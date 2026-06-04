@@ -160,16 +160,18 @@ public class ComfyUiController {
         }
 
         try {
-            String outputFilename = comfyUiService.generateFullOutfit(
+            String[] result = comfyUiService.generateFullOutfit(
                     faceFilename, topFilename, bottomFilename, shoesFilename);
 
-            if (outputFilename == null) {
+            // result[0] = JPG filename, result[1] = PNG filename
+            if (result[0] == null) {
                 return ResponseEntity.ok(GenerateMockupResponse.timeout());
             }
 
             return ResponseEntity.ok(
-                    GenerateMockupResponse.success(
-                            comfyUiService.buildViewUrl(outputFilename)));
+                    GenerateMockupResponse.successWithBoth(
+                            comfyUiService.buildViewUrl(result[0]),
+                            comfyUiService.buildViewUrl(result[1])));
 
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError()

@@ -34,31 +34,26 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final CustomUserDetailsService userDetailsService;
 
-    /** Defines which routes are public and which require authentication. */
+    /**
+     * Temporarily permits all requests without authentication.
+     * JWT enforcement will be re-enabled once the frontend is ready.
+     * To re-enable: replace anyRequest().permitAll() with anyRequest().authenticated()
+     * and uncomment the addFilterBefore line.
+     */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http)
             throws Exception {
 
         http
-                // Disable CSRF — not needed for stateless REST APIs
                 .csrf(AbstractHttpConfigurer::disable)
+                .headers(headers -> headers.frameOptions(
+                        frame -> frame.sameOrigin())) // allows H2 console iframe
                 .authorizeHttpRequests(auth -> auth
-                        // These routes are open to everyone (no login needed)
-                        .requestMatchers(
-                                "/api/auth/**",
-                                "/api/tags",
-                                "/uploads/**")
-                        .permitAll()
-                        // All other routes require a valid JWT token
-                        .anyRequest().authenticated())
-                // Use stateless sessions — no server-side session storage
+                        .anyRequest().permitAll())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authenticationProvider(authenticationProvider())
-                // Run our JWT filter before Spring's default login filter
-                .addFilterBefore(
-                        jwtAuthFilter,
-                        UsernamePasswordAuthenticationFilter.class);
+                .authenticationProvider(authenticationProvider());
+                // .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

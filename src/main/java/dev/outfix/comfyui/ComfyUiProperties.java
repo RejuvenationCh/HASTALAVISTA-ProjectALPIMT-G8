@@ -74,6 +74,13 @@ public class ComfyUiProperties {
 
         /** Node ID of the final output node in the full outfit workflow. */
         private String fullOutfitOutputNodeId = "163";
+
+        /**
+         * Node ID of the second output in the full outfit workflow.
+         * This output runs the result through RMBG to remove the background,
+         * producing a transparent PNG alongside the regular JPG.
+         */
+        private String pngOutputNodeId = "331";
     }
 
     /**

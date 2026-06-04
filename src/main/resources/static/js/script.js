@@ -1,8 +1,136 @@
+// ── NOTIFICATION MOCK DATA ────────────────────────────────────────────────────
+const NOTIF_STORAGE_KEY = 'outfix_notif_read_ids';
+
+const _mockNotifications = [
+    {
+        id: 'n1',
+        type: 'generation',
+        title: 'Generation Complete',
+        message: 'Your outfit mockup for "Morning Lecture" is ready to view.',
+        time: '2 min ago',
+        read: false
+    },
+    {
+        id: 'n2',
+        type: 'schedule',
+        title: 'Upcoming Event',
+        message: "Team Meeting tomorrow — don't forget to plan your outfit.",
+        time: '1 hour ago',
+        read: false
+    },
+    {
+        id: 'n3',
+        type: 'generation',
+        title: 'Generation Complete',
+        message: 'Your outfit mockup for "Casual Friday" has been generated.',
+        time: '3 hours ago',
+        read: true
+    },
+    {
+        id: 'n4',
+        type: 'schedule',
+        title: 'New Agenda Added',
+        message: 'Campus Event on June 10 — formality token 3 assigned.',
+        time: 'Yesterday',
+        read: true
+    }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
+
+    // ── NOTIFICATION PANEL ────────────────────────────────────────────────────
+    const bellBtn    = document.getElementById('notif-bell-btn');
+    const notifPanel = document.getElementById('notif-panel');
+    const notifBadge = document.getElementById('notif-badge');
+
+    if (bellBtn && notifPanel) {
+
+        // Restore read state from previous page visits
+        const _savedReadIds = JSON.parse(sessionStorage.getItem(NOTIF_STORAGE_KEY) || '[]');
+        _mockNotifications.forEach(n => { if (_savedReadIds.includes(n.id)) n.read = true; });
+
+        const saveReadState = () => {
+            const readIds = _mockNotifications.filter(n => n.read).map(n => n.id);
+            sessionStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(readIds));
+        };
+
+        const renderNotifPanel = () => {
+            const unread = _mockNotifications.filter(n => !n.read);
+            notifBadge.textContent = unread.length;
+            notifBadge.style.display = unread.length > 0 ? 'flex' : 'none';
+
+            if (_mockNotifications.length === 0) {
+                notifPanel.innerHTML = `
+                    <div class="notif-panel-header">
+                        <h3>Notifications</h3>
+                    </div>
+                    <div class="notif-empty">
+                        <i class="fa-regular fa-bell-slash"></i>
+                        You're all caught up.
+                    </div>`;
+                return;
+            }
+
+            const items = _mockNotifications.map(n => `
+                <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
+                    <div class="notif-icon-wrap ${n.type}">
+                        <i class="fa-solid ${n.type === 'generation' ? 'fa-wand-magic-sparkles' : 'fa-calendar-check'}"></i>
+                    </div>
+                    <div class="notif-body">
+                        <p class="notif-title">${n.title}</p>
+                        <p class="notif-message">${n.message}</p>
+                        <span class="notif-time">${n.time}</span>
+                    </div>
+                    ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
+                </div>`).join('');
+
+            notifPanel.innerHTML = `
+                <div class="notif-panel-header">
+                    <h3>Notifications</h3>
+                    <button class="notif-mark-all-btn" id="mark-all-read-btn">Mark all as read</button>
+                </div>
+                <div class="notif-list">${items}</div>`;
+
+            // Mark individual as read on click
+            notifPanel.querySelectorAll('.notif-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const n = _mockNotifications.find(n => n.id === el.dataset.id);
+                    if (n) { n.read = true; saveReadState(); renderNotifPanel(); }
+                });
+            });
+
+            // Mark all as read
+            const markAllBtn = document.getElementById('mark-all-read-btn');
+            if (markAllBtn) {
+                markAllBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    _mockNotifications.forEach(n => n.read = true);
+                    saveReadState();
+                    renderNotifPanel();
+                });
+            }
+        };
+
+        renderNotifPanel();
+
+        // Toggle panel open/close
+        bellBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            notifPanel.classList.toggle('active');
+        });
+
+        // Close when clicking anywhere outside
+        document.addEventListener('click', (e) => {
+            if (!notifPanel.contains(e.target) && e.target !== bellBtn) {
+                notifPanel.classList.remove('active');
+            }
+        });
+    }
 
     // ========================================================
     // 1. SLIDER LOGIC (Only runs if slider exists on the page)
     // ========================================================
+
     const slidesWrapper = document.querySelector('.slides-wrapper');
     if (slidesWrapper) {
         const slides = document.querySelectorAll('.slide');
@@ -84,10 +212,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Attach click events to any explicit elements with the .auth-trigger class
+    // Reads data-modal="signup" to open signup view, defaults to login
     authTriggers.forEach(trigger => {
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
-            openModal('login');
+            openModal(trigger.dataset.modal || 'login');
         });
     });
 
@@ -119,6 +248,83 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleToLogin.addEventListener('click', (e) => {
             e.preventDefault();
             openModal('login');
+        });
+    }
+
+    // ── LOGIN submit ──────────────────────────────────────────────────────────
+    const loginSubmitBtn  = document.getElementById('login-submit-btn');
+    const loginErrorEl    = document.getElementById('login-error');
+
+    if (loginSubmitBtn) {
+        loginSubmitBtn.addEventListener('click', async () => {
+            const email    = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            if (!email || !password) {
+                loginErrorEl.textContent = 'Please enter your email and password.';
+                loginErrorEl.style.display = 'block';
+                return;
+            }
+
+            loginErrorEl.style.display = 'none';
+            loginSubmitBtn.textContent = 'Logging in…';
+            loginSubmitBtn.disabled = true;
+
+            try {
+                const { token, user } = await AuthService.login(email, password);
+                AppState.auth.isLoggedIn = true;
+                AppState.auth.user  = user;
+                AppState.auth.token = token;
+
+                modalOverlay.style.display = 'none';
+
+                // Redirect to wardrobe after successful login
+                window.location.href = '/wardrobe';
+            } catch (err) {
+                loginErrorEl.textContent = err.message;
+                loginErrorEl.style.display = 'block';
+                loginSubmitBtn.textContent = 'Login';
+                loginSubmitBtn.disabled = false;
+            }
+        });
+    }
+
+    // ── SIGNUP submit ─────────────────────────────────────────────────────────
+    const signupSubmitBtn = document.getElementById('signup-submit-btn');
+    const signupErrorEl   = document.getElementById('signup-error');
+
+    if (signupSubmitBtn) {
+        signupSubmitBtn.addEventListener('click', async () => {
+            const name     = document.getElementById('signup-name').value.trim();
+            const email    = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            if (!name || !email || !password) {
+                signupErrorEl.textContent = 'Please fill in all fields.';
+                signupErrorEl.style.display = 'block';
+                return;
+            }
+
+            signupErrorEl.style.display = 'none';
+            signupSubmitBtn.textContent = 'Creating account…';
+            signupSubmitBtn.disabled = true;
+
+            try {
+                const { token, user } = await AuthService.register(email, password);
+                AppState.auth.isLoggedIn = true;
+                AppState.auth.user  = user;
+                AppState.auth.token = token;
+
+                modalOverlay.style.display = 'none';
+
+                // New users go to wardrobe — tutorial modal will be handled there later
+                window.location.href = '/wardrobe';
+            } catch (err) {
+                signupErrorEl.textContent = err.message;
+                signupErrorEl.style.display = 'block';
+                signupSubmitBtn.textContent = 'Create Account';
+                signupSubmitBtn.disabled = false;
+            }
         });
     }
 });

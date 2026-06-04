@@ -9,7 +9,7 @@
 body {
     background-color: #ffffff;
     color: #000;
-    overflow-x: hidden; 
+    overflow-x: hidden;
 }
 
 /* =========================================
@@ -20,8 +20,8 @@ body {
     top: 0;
     z-index: 1000;
     background-color: #ffffff;
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
     align-items: center;
     padding: 20px 50px;
     border-bottom: 1px solid #f0f0f0;
@@ -36,9 +36,7 @@ body {
 .nav-links {
     display: flex;
     gap: 40px;
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
+    justify-content: center;
 }
 
 .nav-links a {
@@ -47,16 +45,23 @@ body {
     font-weight: 700;
     font-size: 14px;
     padding: 10px 0;
-    transition: color 0.3s ease; 
+    transition: color 0.3s ease;
 }
 
 .nav-links a:hover {
-    color: #666; 
+    color: #666;
+}
+
+.nav-links a.active {
+    color: #000;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
 }
 
 .nav-actions {
     display: flex;
     align-items: center;
+    justify-content: flex-end;
     gap: 25px;
 }
 
@@ -74,7 +79,7 @@ body {
 .slider-container {
     position: relative;
     width: 100%;
-    height: calc(100vh - 101px); 
+    height: calc(100vh - 101px);
     overflow: hidden;
     background-color: #fff;
     border-bottom: 1px solid #e0e0e0;
@@ -98,8 +103,8 @@ body {
 .full-slide-img {
     width: 100%;
     height: 100%;
-    object-fit: contain; 
-    object-position: center; 
+    object-fit: contain;
+    object-position: center;
 }
 
 .slider-btn {
@@ -108,7 +113,7 @@ body {
     transform: translateY(-50%);
     background: transparent;
     border: none;
-    color: #d3d3d3; 
+    color: #d3d3d3;
     font-size: 50px;
     font-weight: 300;
     cursor: pointer;
@@ -128,7 +133,7 @@ body {
    ========================================= */
 .about-section {
     position: relative;
-    overflow: hidden; 
+    overflow: hidden;
     padding: 120px 20px;
     display: flex;
     justify-content: center;
@@ -140,9 +145,9 @@ body {
 .about-img {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%); 
-    height: 90%;             
-    z-index: 1;                 
+    transform: translateY(-50%);
+    height: 90%;
+    z-index: 1;
     object-fit: contain;
 }
 
@@ -151,7 +156,7 @@ body {
 
 .about-content {
     position: relative;
-    z-index: 2; 
+    z-index: 2;
     max-width: 800px;
     margin: 0 auto;
 }
@@ -191,7 +196,7 @@ body {
    FOOTER SECTION
    ========================================= */
 .site-footer {
-    background-color: #1a1a1a; 
+    background-color: #1a1a1a;
     color: #ffffff;
     padding: 60px 20px;
     text-align: center;
@@ -201,22 +206,22 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 25px; 
+    gap: 25px;
     max-width: 800px;
     margin: 0 auto;
 }
 
 .school-logo {
-    height: 200px; 
+    height: 200px;
     width: auto;
     object-fit: contain;
-    filter: brightness(0) invert(1); 
+    filter: brightness(0) invert(1);
 }
 
 .footer-text p {
     font-size: 13px;
     line-height: 1.6;
-    color: #888888; 
+    color: #888888;
     margin-bottom: 12px;
 }
 
@@ -224,7 +229,7 @@ body {
    AUTHENTICATION OVERLAYS (MODAL)
    ========================================= */
 .modal-overlay {
-    display: none; 
+    display: none;
     position: fixed;
     top: 0;
     left: 0;
@@ -339,8 +344,8 @@ body {
 
 .create-now-btn {
     position: absolute;
-    bottom: 25%; 
-    right: 15%; 
+    bottom: 25%;
+    right: 15%;
     background-color: #222;
     color: #fff;
     padding: 15px 60px;
@@ -434,304 +439,195 @@ body {
     color: #ccc;
 }
 
-/* ==========================================================================
-   WARDROBE DASHBOARD FRAMEWORK WORKSPACE
-   ========================================================================== */
-.wardrobe-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 60px 50px;
-    min-height: calc(100vh - 140px);
+/* =========================================
+   NOTIFICATION PANEL
+   ========================================= */
+.notif-bell-wrap {
+    position: relative;
 }
 
-.wardrobe-header {
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #000;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.notif-panel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    width: 340px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notif-panel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.notif-panel-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 40px;
-    border-bottom: 2px solid #000000;
-    padding-bottom: 25px;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
 }
 
-.header-titles h1 {
-    font-size: 38px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
+.notif-panel-header h3 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
 }
 
-.header-titles p {
-    font-size: 14px;
-    color: #666666;
+.notif-mark-all-btn {
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: #888;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
 }
 
-/* Stylized + Button Action Switch */
-.add-item-trigger-btn {
+.notif-mark-all-btn:hover {
+    color: #000;
+}
+
+.notif-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.15s;
+    cursor: default;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item:hover {
+    background: #fafafa;
+}
+
+.notif-item.unread {
+    background: #f8f8f8;
+}
+
+.notif-item.unread:hover {
+    background: #f2f2f2;
+}
+
+.notif-icon-wrap {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    background: #000;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.notif-icon-wrap.schedule {
+    background: #444;
+}
+
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 3px;
+}
+
+.notif-message {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.notif-time {
+    font-size: 10px;
+    color: #aaa;
+    font-weight: 600;
+}
+
+.notif-unread-dot {
+    width: 7px;
+    height: 7px;
+    background: #000;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.notif-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.notif-empty i {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+/* =========================================
+   SHARED ACTION BUTTONS
+   ========================================= */
+.auth-primary-btn {
     background-color: #000000;
     color: #ffffff;
     border: 1px solid #000000;
-    padding: 14px 28px;
+    padding: 14px 35px;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 1.5px;
     cursor: pointer;
-    border-radius: 0px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-}
-
-.add-item-trigger-btn:hover {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-/* Navigation Category Filter Selection Tabs row */
-.category-filters {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 40px;
-}
-
-.filter-tab {
-    background: none;
-    border: 1px solid #e5e5e5;
-    padding: 10px 24px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 0px;
     transition: all 0.2s ease;
 }
 
-.filter-tab:hover, .filter-tab.active {
-    background-color: #000000;
-    color: #ffffff;
-    border-color: #000000;
-}
-
-/* ==========================================================================
-   DYNAMIC APPAREL GRID SYSTEM & CARDS DISPLAY
-   ========================================================================== */
-.wardrobe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 35px;
-    width: 100%;
-}
-
-.empty-state-message {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 0;
-    color: #888888;
-    font-size: 15px;
-    border: 1px dashed #cccccc;
-}
-
-/* Clothing Catalog Cards */
-.clothing-card {
-    position: relative;
-    background-color: #ffffff;
-    border: 1px solid #eeeeee;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
-}
-
-.clothing-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-}
-
-.card-image-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: #fafafa;
-    overflow: hidden;
-    margin-bottom: 15px;
-    position: relative;
-}
-
-.card-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-/* Floating Delete Button Badge Overlay */
-.delete-item-badge-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+.auth-primary-btn:hover {
     background-color: #ffffff;
     color: #000000;
-    border: 1px solid #000000;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 5;
-}
-
-.clothing-card:hover .delete-item-badge-btn {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.delete-item-badge-btn:hover {
-    background-color: #000000;
-    color: #ffffff;
-}
-
-/* Card Metadata Copy Blocks */
-.card-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.card-details .item-tag {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: #888888;
-    letter-spacing: 0.5px;
-}
-
-.card-details h3 {
-    font-size: 15px;
-    font-weight: 700;
-    color: #000000;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-details .item-meta-color {
-    font-size: 12px;
-    color: #666666;
-}
-
-/* ==========================================================================
-   ADVANCED OVERLAY SPLIT-PANEL STYLING
-   ========================================================================== */
-.wardrobe-modal-card {
-    max-width: 750px !important; /* Expands bounds structural tracking for dual-column alignment */
-}
-
-.modal-split-layout {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.uploader-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-inputs-column {
-    flex: 1.2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.form-label {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    color: #000000;
-}
-
-/* Interactive Drag Drop Box Target Frame */
-.image-upload-dropzone {
-    width: 100%;
-    flex-grow: 1;
-    min-height: 220px;
-    border: 2px dashed #000000;
-    background-color: #fafafa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-    text-align: center;
-    padding: 20px;
-    transition: background-color 0.2s ease;
-}
-
-.image-upload-dropzone:hover {
-    background-color: #f1f1f1;
-}
-
-.dropzone-prompt .upload-icon {
-    font-size: 36px;
-    color: #444444;
-    margin-bottom: 12px;
-}
-
-.dropzone-prompt p {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.dropzone-prompt span {
-    font-size: 11px;
-    color: #888888;
-}
-
-/* Live dynamic rendering preview element layout configurations */
-#upload-preview-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background-color: #ffffff;
-    z-index: 2;
-}
-
-.upload-preview-hidden {
-    display: none;
-}
-
-/* Secondary Selector tags configuration styling */
-select {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
-    border: 1px solid #000000;
-    background-color: #ffffff;
-    border-radius: 0px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M0 3l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-}
-
-/* Modal Bottom Action Footers Grid Arrangement */
-.modal-action-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    border-top: 1px solid #eeeeee;
-    padding-top: 20px;
 }
 
 .auth-secondary-btn {
@@ -748,135 +644,4 @@ select {
 
 .auth-secondary-btn:hover {
     border-color: #000000;
-}
-
-/* Responsive Dashboard Breaks */
-@media screen and (max-width: 768px) {
-    .wardrobe-container { padding: 40px 20px; }
-    .wardrobe-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .add-item-trigger-btn { width: 100%; justify-content: center; }
-    .category-filters { overflow-x: auto; padding-bottom: 10px; width: 100%; }
-    .modal-split-layout { flex-direction: column; gap: 25px; }
-    .image-upload-dropzone { min-height: 180px; }
-}
-
-/* ==========================================================================
-   WARDROBE PAGE - ADD ITEM MODAL OVERLAY STYLES
-   (uses its own .wardrobe-overlay class so it does NOT collide with the
-    login/auth .modal-overlay above, which is toggled via display:none/flex)
-   ========================================================================== */
-.wardrobe-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Dimmed background tint */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-
-    /* Completely hidden by default */
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-}
-
-/* Activated State triggered via JavaScript .classList.add('active') */
-.wardrobe-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* The Modal Container Card Box */
-.modal-card {
-    background-color: #ffffff;
-    border: 2px solid #000000;
-    padding: 40px;
-    position: relative;
-    width: 90%;
-    max-width: 750px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
-}
-
-.wardrobe-overlay.active .modal-card {
-    transform: translateY(0);
-}
-
-/* Close Exit button top-right cross icon layout position */
-.modal-close-x {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #000000;
-    line-height: 1;
-    transition: color 0.2s ease;
-}
-
-.modal-close-x:hover {
-    color: #666666;
-}
-
-.auth-header {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #eeeeee;
-    padding-bottom: 15px;
-}
-
-.auth-header h2 {
-    font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
-}
-
-.auth-header p {
-    font-size: 13px;
-    color: #666666;
-    margin-top: 5px;
-}
-
-/* Form inputs styling layouts */
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-}
-
-.form-group input[type="text"] {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
-    border: 1px solid #000000;
-    border-radius: 0px;
-    outline: none;
-}
-
-.auth-primary-btn {
-    background-color: #000000;
-    color: #ffffff;
-    border: 1px solid #000000;
-    padding: 14px 35px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.auth-primary-btn:hover {
-    background-color: #ffffff;
-    color: #000000;
 }

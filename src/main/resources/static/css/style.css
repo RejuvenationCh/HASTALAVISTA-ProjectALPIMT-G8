@@ -762,8 +762,10 @@ select {
 
 /* ==========================================================================
    WARDROBE PAGE - ADD ITEM MODAL OVERLAY STYLES
+   (uses its own .wardrobe-overlay class so it does NOT collide with the
+    login/auth .modal-overlay above, which is toggled via display:none/flex)
    ========================================================================== */
-.modal-overlay {
+.wardrobe-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -774,7 +776,7 @@ select {
     justify-content: center;
     align-items: center;
     z-index: 2000;
-    
+
     /* Completely hidden by default */
     opacity: 0;
     pointer-events: none;
@@ -782,7 +784,7 @@ select {
 }
 
 /* Activated State triggered via JavaScript .classList.add('active') */
-.modal-overlay.active {
+.wardrobe-overlay.active {
     opacity: 1;
     pointer-events: auto;
 }
@@ -800,7 +802,7 @@ select {
     transition: transform 0.3s ease;
 }
 
-.modal-overlay.active .modal-card {
+.wardrobe-overlay.active .modal-card {
     transform: translateY(0);
 }
 

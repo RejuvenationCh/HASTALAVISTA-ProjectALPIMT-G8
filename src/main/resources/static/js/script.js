@@ -1,8 +1,7 @@
 // ── NOTIFICATION MOCK DATA ────────────────────────────────────────────────────
 const NOTIF_STORAGE_KEY = 'outfix_notif_read_ids';
 
-const _mockNotifications = [
-    {
+const _mockNotifications = [{
         id: 'n1',
         type: 'generation',
         title: 'Generation Complete',
@@ -39,7 +38,7 @@ const _mockNotifications = [
 document.addEventListener('DOMContentLoaded', () => {
 
     // ── NOTIFICATION PANEL ────────────────────────────────────────────────────
-    const bellBtn    = document.getElementById('notif-bell-btn');
+    const bellBtn = document.getElementById('notif-bell-btn');
     const notifPanel = document.getElementById('notif-panel');
     const notifBadge = document.getElementById('notif-badge');
 
@@ -47,7 +46,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Restore read state from previous page visits
         const _savedReadIds = JSON.parse(sessionStorage.getItem(NOTIF_STORAGE_KEY) || '[]');
-        _mockNotifications.forEach(n => { if (_savedReadIds.includes(n.id)) n.read = true; });
+        _mockNotifications.forEach(n => {
+            if (_savedReadIds.includes(n.id)) n.read = true;
+        });
 
         const saveReadState = () => {
             const readIds = _mockNotifications.filter(n => n.read).map(n => n.id);
@@ -95,7 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
             notifPanel.querySelectorAll('.notif-item').forEach(el => {
                 el.addEventListener('click', () => {
                     const n = _mockNotifications.find(n => n.id === el.dataset.id);
-                    if (n) { n.read = true; saveReadState(); renderNotifPanel(); }
+                    if (n) {
+                        n.read = true;
+                        saveReadState();
+                        renderNotifPanel();
+                    }
                 });
             });
 
@@ -252,12 +257,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── LOGIN submit ──────────────────────────────────────────────────────────
-    const loginSubmitBtn  = document.getElementById('login-submit-btn');
-    const loginErrorEl    = document.getElementById('login-error');
+    const loginSubmitBtn = document.getElementById('login-submit-btn');
+    const loginErrorEl = document.getElementById('login-error');
 
     if (loginSubmitBtn) {
         loginSubmitBtn.addEventListener('click', async () => {
-            const email    = document.getElementById('login-email').value.trim();
+            const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
             if (!email || !password) {
@@ -271,9 +276,12 @@ document.addEventListener('DOMContentLoaded', () => {
             loginSubmitBtn.disabled = true;
 
             try {
-                const { token, user } = await AuthService.login(email, password);
+                const {
+                    token,
+                    user
+                } = await AuthService.login(email, password);
                 AppState.auth.isLoggedIn = true;
-                AppState.auth.user  = user;
+                AppState.auth.user = user;
                 AppState.auth.token = token;
 
                 modalOverlay.style.display = 'none';
@@ -291,12 +299,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ── SIGNUP submit ─────────────────────────────────────────────────────────
     const signupSubmitBtn = document.getElementById('signup-submit-btn');
-    const signupErrorEl   = document.getElementById('signup-error');
+    const signupErrorEl = document.getElementById('signup-error');
 
     if (signupSubmitBtn) {
         signupSubmitBtn.addEventListener('click', async () => {
-            const name     = document.getElementById('signup-name').value.trim();
-            const email    = document.getElementById('signup-email').value.trim();
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value.trim();
 
             if (!name || !email || !password) {
@@ -310,9 +318,12 @@ document.addEventListener('DOMContentLoaded', () => {
             signupSubmitBtn.disabled = true;
 
             try {
-                const { token, user } = await AuthService.register(email, password);
+                const {
+                    token,
+                    user
+                } = await AuthService.register(email, password);
                 AppState.auth.isLoggedIn = true;
-                AppState.auth.user  = user;
+                AppState.auth.user = user;
                 AppState.auth.token = token;
 
                 modalOverlay.style.display = 'none';

@@ -1,13 +1,14 @@
 package dev.outfix.wardrobe.dto;
 
+import java.time.LocalDateTime;
+
+import dev.outfix.clothing.dto.ClothingResponseDto;
+import dev.outfix.wardrobe.entity.WardrobeStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-/**
- * The clothing item data sent back to the client.
- */
 @Getter
 @Builder
 @NoArgsConstructor
@@ -15,13 +16,15 @@ import lombok.NoArgsConstructor;
 public class WardrobeResponseDto {
 
     private Long id;
+    private Long scheduleId;
 
-    /** URL to the clothing item's photo. Null if no photo was uploaded. */
-    private String clothingImageUrl;
+    private ClothingResponseDto topClothing;
+    private ClothingResponseDto bottomClothing;
+    private ClothingResponseDto shoesClothing;
 
-    /** Formality level assigned by the user. */
-    private int tokenFormalitas;
+    private String mockupJpgUrl;
+    private String mockupPngUrl;
 
-    /** Tags describing the item (e.g. "Men,Top,Casual"). */
-    private String tags;
+    private WardrobeStatus status;
+    private LocalDateTime createdAt;
 }

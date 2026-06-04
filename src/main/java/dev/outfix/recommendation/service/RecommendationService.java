@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import dev.outfix.clothing.dto.ClothingResponseDto;
+import dev.outfix.clothing.entity.Clothing;
+import dev.outfix.clothing.repository.ClothingRepository;
 import dev.outfix.recommendation.dto.RecommendationResponseDto;
 import dev.outfix.schedule.entity.Schedule;
 import dev.outfix.schedule.service.ScheduleService;
 import dev.outfix.user.entity.User;
-import dev.outfix.wardrobe.dto.WardrobeResponseDto;
-import dev.outfix.wardrobe.entity.Wardrobe;
-import dev.outfix.wardrobe.repository.WardrobeRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -18,16 +18,12 @@ import lombok.RequiredArgsConstructor;
 public class RecommendationService {
 
     private final ScheduleService scheduleService;
-    private final WardrobeRepository wardrobeRepository;
+    private final ClothingRepository clothingRepository;
 
-    /**
-     * Finds wardrobe items that match the formality token and tag of the given schedule.
-     * Returns the empty fallback payload when no items match.
-     */
     public RecommendationResponseDto recommend(Long scheduleId, User requestingUser) {
         Schedule schedule = scheduleService.getById(scheduleId, requestingUser);
 
-        List<Wardrobe> matches = wardrobeRepository.findMatchingItems(
+        List<Clothing> matches = clothingRepository.findMatchingItems(
                 requestingUser,
                 schedule.getTargetToken(),
                 schedule.getTargetTag(),
@@ -37,12 +33,12 @@ public class RecommendationService {
             return RecommendationResponseDto.empty();
         }
 
-        List<WardrobeResponseDto> items = matches.stream()
-                .map(w -> WardrobeResponseDto.builder()
-                        .id(w.getId())
-                        .clothingImageUrl(w.getClothingImageUrl())
-                        .tokenFormalitas(w.getTokenFormalitas())
-                        .tags(w.getTags())
+        List<ClothingResponseDto> items = matches.stream()
+                .map(c -> ClothingResponseDto.builder()
+                        .id(c.getId())
+                        .clothingImageUrl(c.getClothingImageUrl())
+                        .tokenFormalitas(c.getTokenFormalitas())
+                        .tags(c.getTags())
                         .build())
                 .toList();
 

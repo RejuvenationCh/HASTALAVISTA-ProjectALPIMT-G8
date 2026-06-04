@@ -2,9 +2,13 @@ package dev.outfix.wardrobe.entity;
 
 import java.time.LocalDateTime;
 
+import dev.outfix.clothing.entity.Clothing;
+import dev.outfix.schedule.entity.Schedule;
 import dev.outfix.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,8 +22,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
- * Represents a single clothing item in a user's wardrobe.
- * Maps to the "wardrobes" table in the database.
+ * A saved outfit — a combination of clothing items chosen from the user's
+ * clothing collection, linked to a schedule activity, with a ComfyUI mockup
+ * generated in the background after saving.
  */
 @Entity
 @Table(name = "wardrobes")
@@ -30,34 +35,42 @@ import lombok.Setter;
 @Builder
 public class Wardrobe {
 
-    /** Auto-generated unique ID for each wardrobe item. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    /** The user who owns this clothing item. */
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    /** URL path to the uploaded photo of the clothing item. */
-    @Column(name = "clothing_image_url")
-    private String clothingImageUrl;
+    /** The schedule activity this outfit was created for. Nullable — can be a standalone outfit. */
+    @ManyToOne
+    @JoinColumn(name = "schedule_id")
+    private Schedule schedule;
 
-    /**
-     * Formality level assigned by the user (e.g. 1 = casual, 5 = formal).
-     * Used to match clothing items to schedule requirements.
-     */
-    @Column(name = "token_formalitas", nullable = false)
-    private int tokenFormalitas;
+    @ManyToOne
+    @JoinColumn(name = "top_clothing_id")
+    private Clothing topClothing;
 
-    /**
-     * Comma-separated tags describing the item (e.g. "Men,Top,Casual").
-     * Used for filtering during outfit recommendation.
-     */
-    @Column(name = "tags")
-    private String tags;
+    @ManyToOne
+    @JoinColumn(name = "bottom_clothing_id")
+    private Clothing bottomClothing;
 
-    /** Timestamp of when this item was added to the wardrobe. */
+    @ManyToOne
+    @JoinColumn(name = "shoes_clothing_id")
+    private Clothing shoesClothing;
+
+    /** URL to the ComfyUI-generated JPG mockup. Populated after generation completes. */
+    @Column(name = "mockup_jpg_url")
+    private String mockupJpgUrl;
+
+    /** URL to the background-removed PNG mockup. Populated after generation completes. */
+    @Column(name = "mockup_png_url")
+    private String mockupPngUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private WardrobeStatus status;
+
     private LocalDateTime createdAt;
 }

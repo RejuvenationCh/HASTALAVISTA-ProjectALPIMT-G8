@@ -1,11 +1,16 @@
 package dev.outfix.comfyui;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Random;
 
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import tools.jackson.databind.JsonNode;
@@ -325,5 +330,32 @@ public class ComfyUiService {
      */
     public String buildViewUrl(String outputFilename) {
         return props.getBaseUrl() + "/view?filename=" + outputFilename + "&type=output";
+    }
+
+    /**
+     * Uploads a file from the local server filesystem to ComfyUI's input folder.
+     * Used internally when generating mockups from saved clothing/face-model files.
+     *
+     * @param localFilePath absolute or relative path to the file on disk
+     * @return the filename ComfyUI assigned to the uploaded file
+     */
+    public String uploadLocalFile(Path localFilePath) {
+        MultipartBodyBuilder builder = new MultipartBodyBuilder();
+        builder.part("image", new FileSystemResource(localFilePath));
+        builder.part("overwrite", "true");
+
+        Map<?, ?> response = comfyUiWebClient.post()
+                .uri("/upload/image")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
+
+        if (response == null || !response.containsKey("name")) {
+            throw new IllegalStateException(
+                    "ComfyUI did not return a filename for: " + localFilePath);
+        }
+        return (String) response.get("name");
     }
 }

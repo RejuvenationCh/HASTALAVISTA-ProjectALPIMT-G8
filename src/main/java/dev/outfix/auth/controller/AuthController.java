@@ -1,39 +1,50 @@
 package dev.outfix.auth.controller;
 
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+import dev.outfix.auth.dto.AuthResponseDto;
+import dev.outfix.auth.dto.LoginRequestDto;
 import dev.outfix.auth.dto.RegisterRequestDto;
-import dev.outfix.user.service.UserService;
+import dev.outfix.auth.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
-@Controller
+/**
+ * Handles HTTP requests for user registration and login.
+ * These endpoints are public — no JWT token is needed to access them.
+ */
+@RestController
+@RequestMapping("/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    @GetMapping("/register")
-    public String registerPage() {
-        return "auth/register";
-    }
-
+    /**
+     * POST /api/auth/register
+     * Creates a new account and returns a JWT token.
+     */
     @PostMapping("/register")
-    public String register(
-            @Valid RegisterRequestDto request) {
+    public ResponseEntity<AuthResponseDto> register(
+            @Valid @RequestBody RegisterRequestDto request) {
 
-        userService.register(
-                request.getUsername(),
-                request.getEmail(),
-                request.getPassword());
-
-        return "redirect:/login";
+        AuthResponseDto response = authService.register(request);
+        return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/login")
-    public String loginPage() {
-        return "auth/login";
+    /**
+     * POST /api/auth/login
+     * Verifies credentials and returns a JWT token.
+     */
+    @PostMapping("/login")
+    public ResponseEntity<AuthResponseDto> login(
+            @Valid @RequestBody LoginRequestDto request) {
+
+        AuthResponseDto response = authService.login(request);
+        return ResponseEntity.ok(response);
     }
 }

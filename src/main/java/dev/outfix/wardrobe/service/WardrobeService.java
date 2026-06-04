@@ -18,30 +18,26 @@ public class WardrobeService {
 
     public Wardrobe createWardrobe(
             User user,
-            String name,
-            String description) {
+            String clothingImageUrl,
+            int tokenFormalitas,
+            String tags) {
 
         Wardrobe wardrobe = Wardrobe.builder()
-                .name(name)
-                .description(description)
                 .user(user)
+                .clothingImageUrl(clothingImageUrl)
+                .tokenFormalitas(tokenFormalitas)
+                .tags(tags)
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        return wardrobeRepository.save(
-                wardrobe);
+        return wardrobeRepository.save(wardrobe);
     }
 
-    public List<Wardrobe> getUserWardrobes(
-            User user) {
-        return wardrobeRepository.findByUser(
-                user);
+    public List<Wardrobe> getUserWardrobes(User user) {
+        return wardrobeRepository.findByUser(user);
     }
 
-    public void deleteWardrobe(
-            Long id) {
-
+    public void deleteWardrobe(Long id) {
         wardrobeRepository.deleteById(id);
-
     }
 }

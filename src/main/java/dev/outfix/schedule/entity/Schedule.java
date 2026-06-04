@@ -1,6 +1,4 @@
-package dev.outfix.wardrobe.entity;
-
-import java.time.LocalDateTime;
+package dev.outfix.schedule.entity;
 
 import dev.outfix.user.entity.User;
 import jakarta.persistence.Column;
@@ -18,14 +16,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "wardrobes")
+@Table(name = "schedules")
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Wardrobe {
+public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,14 +33,12 @@ public class Wardrobe {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "clothing_image_url")
-    private String clothingImageUrl;
+    @Column(name = "activity_name", nullable = false)
+    private String activityName;
 
-    @Column(name = "token_formalitas", nullable = false)
-    private int tokenFormalitas;
+    @Column(name = "target_token", nullable = false)
+    private int targetToken;
 
-    @Column(name = "tags")
-    private String tags;
-
-    private LocalDateTime createdAt;
+    @Column(name = "target_tag")
+    private String targetTag;
 }

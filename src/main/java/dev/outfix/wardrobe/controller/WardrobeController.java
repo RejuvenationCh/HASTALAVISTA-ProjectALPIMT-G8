@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 public class WardrobeController {
 
     private final WardrobeService wardrobeService;
-
     private final UserRepository userRepository;
 
     @GetMapping
@@ -30,21 +29,18 @@ public class WardrobeController {
             Model model) {
 
         User user = userRepository
-                .findByEmail(
-                        authentication.getName())
+                .findByEmail(authentication.getName())
                 .orElseThrow();
 
         model.addAttribute(
                 "wardrobes",
-                wardrobeService.getUserWardrobes(
-                        user));
+                wardrobeService.getUserWardrobes(user));
 
         return "wardrobe/list";
     }
 
     @GetMapping("/create")
     public String createPage() {
-
         return "wardrobe/create";
     }
 
@@ -54,25 +50,21 @@ public class WardrobeController {
             Authentication authentication) {
 
         User user = userRepository
-                .findByEmail(
-                        authentication.getName())
+                .findByEmail(authentication.getName())
                 .orElseThrow();
 
         wardrobeService.createWardrobe(
                 user,
-                request.getName(),
-                request.getDescription());
+                request.getClothingImageUrl(),
+                request.getTokenFormalitas(),
+                request.getTags());
 
         return "redirect:/wardrobes";
     }
 
     @PostMapping("/delete/{id}")
-    public String deleteWardrobe(
-            @PathVariable Long id) {
-
-        wardrobeService.deleteWardrobe(
-                id);
-
+    public String deleteWardrobe(@PathVariable Long id) {
+        wardrobeService.deleteWardrobe(id);
         return "redirect:/wardrobes";
     }
 }

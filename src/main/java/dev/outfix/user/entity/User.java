@@ -41,5 +41,12 @@ public class User {
     @Column(nullable = false)
     private String role;
 
+    @Column(name = "face_model_url")
+    private String faceModelUrl;
+
+    @Column(name = "finished_tutorial", nullable = false)
+    @Builder.Default
+    private boolean finishedTutorial = false;
+
     private LocalDateTime createdAt;
 }

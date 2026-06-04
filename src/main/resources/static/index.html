@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outfix — CatVTON Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background: #0f0f0f; }
+    .drop-zone { border: 2px dashed #333; transition: border-color .2s, background .2s; }
+    .drop-zone.drag-over, .drop-zone:hover { border-color: #6366f1; background: rgba(99,102,241,.06); }
+    .spinner { width: 28px; height: 28px; border: 3px solid #2a2a2a; border-top-color: #6366f1;
+               border-radius: 50%; animation: spin .8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body class="min-h-screen text-white font-sans">
+
+  <header class="border-b border-neutral-800 px-8 py-4 flex items-center gap-3">
+    <div class="w-7 h-7 rounded bg-indigo-500 grid place-items-center text-xs font-bold">O</div>
+    <span class="font-semibold tracking-tight">Outfix</span>
+    <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded ml-1">ComfyUI Test UI</span>
+  </header>
+
+  <main class="max-w-3xl mx-auto px-6 py-10 space-y-10">
+
+    <!-- Upload row -->
+    <section>
+      <p class="text-xs uppercase tracking-widest text-neutral-500 mb-5">1 — Upload Photos</p>
+      <div class="grid grid-cols-2 gap-5">
+
+        <div>
+          <p class="text-sm text-neutral-400 mb-2">Person / Body</p>
+          <label for="face-input"
+            class="drop-zone rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer"
+            style="min-height:190px" id="face-zone">
+            <img id="face-preview" class="hidden max-h-44 rounded-lg object-contain" />
+            <div id="face-ph" class="flex flex-col items-center gap-2 text-neutral-600 text-xs">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+              </svg>
+              Click or drop image
+            </div>
+            <input id="face-input" type="file" accept="image/*" class="hidden" />
+          </label>
+        </div>
+
+        <div>
+          <p class="text-sm text-neutral-400 mb-2">Garment / Clothing</p>
+          <label for="garment-input"
+            class="drop-zone rounded-xl flex flex-col items-center justify-center gap-3 cursor-pointer"
+            style="min-height:190px" id="garment-zone">
+            <img id="garment-preview" class="hidden max-h-44 rounded-lg object-contain" />
+            <div id="garment-ph" class="flex flex-col items-center gap-2 text-neutral-600 text-xs">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+              </svg>
+              Click or drop image
+            </div>
+            <input id="garment-input" type="file" accept="image/*" class="hidden" />
+          </label>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Clothing type -->
+    <section>
+      <p class="text-xs uppercase tracking-widest text-neutral-500 mb-4">2 — Clothing Type</p>
+      <div class="flex gap-3" id="type-group">
+        <button data-type="TOP"
+          class="type-btn px-6 py-2.5 rounded-lg text-sm font-medium border transition-all
+                 border-indigo-500 text-white bg-indigo-500/10">Top</button>
+        <button data-type="BOTTOM"
+          class="type-btn px-6 py-2.5 rounded-lg text-sm font-medium border transition-all
+                 border-neutral-700 text-neutral-400 hover:border-neutral-500">Bottom</button>
+        <button data-type="DRESS"
+          class="type-btn px-6 py-2.5 rounded-lg text-sm font-medium border transition-all
+                 border-neutral-700 text-neutral-400 hover:border-neutral-500">Dress</button>
+      </div>
+    </section>
+
+    <!-- Generate -->
+    <section>
+      <p class="text-xs uppercase tracking-widest text-neutral-500 mb-4">3 — Generate</p>
+      <button id="gen-btn" disabled
+        class="w-full py-3.5 rounded-xl font-semibold text-sm tracking-wide
+               bg-indigo-500 hover:bg-indigo-600 disabled:opacity-40 disabled:cursor-not-allowed
+               transition-all">
+        Generate Mockup
+      </button>
+      <p id="status-txt" class="text-xs text-neutral-500 text-center mt-3"></p>
+    </section>
+
+    <!-- Result -->
+    <section id="result-box" class="hidden bg-neutral-900 border border-neutral-800 rounded-2xl p-6 flex flex-col items-center gap-5">
+      <div id="spinner-wrap" class="hidden flex-col items-center gap-4 py-6">
+        <div class="spinner"></div>
+        <p class="text-xs text-neutral-500">Running CatVTON pipeline — this takes 30–90 seconds</p>
+      </div>
+      <img id="result-img" class="hidden rounded-xl max-h-[520px] w-full object-contain" />
+      <p id="result-err" class="hidden text-sm text-red-400 text-center"></p>
+      <a id="dl-btn" class="hidden px-5 py-2.5 rounded-lg bg-neutral-800 hover:bg-neutral-700
+                            text-sm text-white transition-colors" download="outfix_result.jpg">
+        Download
+      </a>
+    </section>
+
+  </main>
+
+  <script>
+    let faceFile    = null;
+    let garmentFile = null;
+    let clothingType = 'TOP';
+
+    // Clothing type toggle
+    document.querySelectorAll('.type-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        clothingType = btn.dataset.type;
+        document.querySelectorAll('.type-btn').forEach(b => {
+          b.className = b.className
+            .replace('border-indigo-500 text-white bg-indigo-500/10', '')
+            .replace('border-neutral-700 text-neutral-400', '')
+            .trim();
+          b.classList.add('border-neutral-700', 'text-neutral-400');
+        });
+        btn.classList.remove('border-neutral-700', 'text-neutral-400');
+        btn.classList.add('border-indigo-500', 'text-white', 'bg-indigo-500/10');
+      });
+    });
+
+    // Drop-zone wiring
+    function wireZone(inputId, previewId, phId, onFile) {
+      const input   = document.getElementById(inputId);
+      const preview = document.getElementById(previewId);
+      const ph      = document.getElementById(phId);
+      const zone    = input.closest('label');
+
+      function load(file) {
+        preview.src = URL.createObjectURL(file);
+        preview.classList.remove('hidden');
+        ph.classList.add('hidden');
+        onFile(file);
+        refreshBtn();
+      }
+
+      input.addEventListener('change', () => { if (input.files[0]) load(input.files[0]); });
+      zone.addEventListener('dragover',  e => { e.preventDefault(); zone.classList.add('drag-over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+      zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        if (e.dataTransfer.files[0]) load(e.dataTransfer.files[0]);
+      });
+    }
+
+    wireZone('face-input',    'face-preview',    'face-ph',    f => faceFile    = f);
+    wireZone('garment-input', 'garment-preview', 'garment-ph', f => garmentFile = f);
+
+    function refreshBtn() {
+      document.getElementById('gen-btn').disabled = !(faceFile && garmentFile);
+    }
+
+    // Generate
+    document.getElementById('gen-btn').addEventListener('click', async () => {
+      const genBtn    = document.getElementById('gen-btn');
+      const statusTxt = document.getElementById('status-txt');
+      const resultBox = document.getElementById('result-box');
+      const spinWrap  = document.getElementById('spinner-wrap');
+      const resultImg = document.getElementById('result-img');
+      const resultErr = document.getElementById('result-err');
+      const dlBtn     = document.getElementById('dl-btn');
+
+      genBtn.disabled = true;
+      resultBox.classList.remove('hidden');
+      spinWrap.classList.remove('hidden');
+      spinWrap.classList.add('flex');
+      resultImg.classList.add('hidden');
+      resultErr.classList.add('hidden');
+      dlBtn.classList.add('hidden');
+      statusTxt.textContent = 'Uploading images…';
+
+      try {
+        // Upload both images through Spring Boot (same origin — no CORS)
+        const faceName    = await uploadImage(faceFile);
+        const garmentName = await uploadImage(garmentFile);
+        statusTxt.textContent = 'Running CatVTON pipeline… please wait.';
+
+        // Trigger the pipeline
+        const res = await fetch('/api/mockup/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            faceFilename:    faceName,
+            garmentFilename: garmentName,
+            clothingType:    clothingType
+          })
+        });
+
+        const data = await res.json();
+        spinWrap.classList.add('hidden');
+        spinWrap.classList.remove('flex');
+
+        if (data.status === 'success') {
+          resultImg.src = data.imageUrl;
+          resultImg.classList.remove('hidden');
+          dlBtn.href = data.imageUrl;
+          dlBtn.classList.remove('hidden');
+          statusTxt.textContent = 'Done!';
+        } else if (data.status === 'timeout') {
+          resultErr.textContent = 'ComfyUI took too long. Try again or increase polling attempts.';
+          resultErr.classList.remove('hidden');
+          statusTxt.textContent = '';
+        } else {
+          resultErr.textContent = data.message || 'Unknown error.';
+          resultErr.classList.remove('hidden');
+          statusTxt.textContent = '';
+        }
+
+      } catch (err) {
+        spinWrap.classList.add('hidden');
+        resultErr.textContent = 'Request failed: ' + err.message;
+        resultErr.classList.remove('hidden');
+        statusTxt.textContent = '';
+      } finally {
+        genBtn.disabled = false;
+        refreshBtn();
+      }
+    });
+
+    // Upload via Spring Boot proxy — avoids direct browser→ComfyUI CORS call
+    async function uploadImage(file) {
+      const form = new FormData();
+      form.append('image', file);
+
+      const res = await fetch('/api/mockup/upload', {
+        method: 'POST',
+        body: form
+      });
+
+      if (!res.ok) throw new Error('Upload failed (HTTP ' + res.status + '). Is Spring Boot running?');
+
+      const json = await res.json();
+      if (json.error) throw new Error(json.error);
+      return json.name;
+    }
+  </script>
+
+</body>
+</html>

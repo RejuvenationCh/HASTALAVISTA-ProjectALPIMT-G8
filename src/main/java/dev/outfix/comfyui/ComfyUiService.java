@@ -1,8 +1,8 @@
 package dev.outfix.comfyui;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
@@ -11,6 +11,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -19,55 +20,84 @@ public class ComfyUiService {
 
     private final ComfyUiProperties props;
     private final ObjectMapper objectMapper;
-    private final WebClient webClient;
+    private final WebClient comfyUiWebClient;
+
+    private final Random random = new Random();
 
     /**
-     * Full pipeline: injects image paths into the workflow template,
-     * submits to ComfyUI, then polls until the output image is ready.
+     * Main entry point called by the controller.
+     * Loads the CatVTON workflow, injects the two image filenames and clothing type,
+     * submits it to ComfyUI, then polls until the output image is ready.
      *
-     * @param faceImageFilename     filename in ComfyUI's input folder (e.g. "face_123.png")
-     * @param garmentImageFilename  filename in ComfyUI's input folder (e.g. "garment_456.png")
-     * @return output image filename from ComfyUI's output folder, or null on timeout
+     * clothingType: "TOP", "BOTTOM", or "DRESS"
      */
-    public String generateMockup(String faceImageFilename, String garmentImageFilename) throws IOException, InterruptedException {
-        ObjectNode workflow = buildWorkflow(faceImageFilename, garmentImageFilename);
+    public String generateMockup(String faceFilename, String garmentFilename, String clothingType)
+            throws IOException, InterruptedException {
+
+        ObjectNode workflow = buildWorkflow(faceFilename, garmentFilename, clothingType);
         String promptId = submitPrompt(workflow);
-        log.info("ComfyUI prompt submitted. prompt_id={}", promptId);
+        log.info("Submitted to ComfyUI. prompt_id={}", promptId);
         return pollForOutputImage(promptId);
     }
 
-    // -------------------------------------------------------------------------
-    // Step 1: Load the JSON template and inject the two image filenames
-    // -------------------------------------------------------------------------
+    // --- Step 1: Build the workflow from the JSON template ---
 
-    private ObjectNode buildWorkflow(String faceImageFilename, String garmentImageFilename) throws IOException {
+    private ObjectNode buildWorkflow(String faceFilename, String garmentFilename, String clothingType)
+            throws IOException {
+
         ClassPathResource resource = new ClassPathResource("comfyui/workflow_template.json");
-        ObjectNode template = (ObjectNode) objectMapper.readTree(resource.getInputStream());
+        ObjectNode workflow = (ObjectNode) objectMapper.readTree(resource.getInputStream());
 
-        injectImageFilename(template, props.getNode().getFaceInputId(), faceImageFilename);
-        injectImageFilename(template, props.getNode().getGarmentInputId(), garmentImageFilename);
+        // Inject person and garment image filenames into their LoadImage nodes
+        setImageFilename(workflow, props.getNode().getFaceInputId(), faceFilename);
+        setImageFilename(workflow, props.getNode().getGarmentInputId(), garmentFilename);
 
-        return template;
+        // Randomize seed on node 305 (CatVTONWrapper) so each render is unique
+        ObjectNode node305 = (ObjectNode) workflow.get("305").get("inputs");
+        node305.put("seed", random.nextLong(1_000_000_000L));
+
+        // Set clothing segmentation flags on node 307 based on clothingType
+        ObjectNode node307 = (ObjectNode) workflow.get("307").get("inputs");
+        applyClothingType(node307, clothingType);
+
+        return workflow;
     }
 
-    /**
-     * Navigates to prompt[nodeId].inputs.image and sets the filename.
-     * This is the "modular" part — node IDs come from config, not hardcoded.
-     */
-    private void injectImageFilename(ObjectNode workflow, String nodeId, String filename) {
+    private void setImageFilename(ObjectNode workflow, String nodeId, String filename) {
         JsonNode node = workflow.get(nodeId);
-        if (node == null || !node.has("inputs")) {
+        if (node == null) {
             throw new IllegalStateException(
-                "ComfyUI workflow template has no node with id='" + nodeId + "'. " +
+                "Workflow template missing node id='" + nodeId + "'. " +
                 "Check comfyui.node.face-input-id / garment-input-id in application.properties."
             );
         }
         ((ObjectNode) node.get("inputs")).put("image", filename);
     }
 
-    // -------------------------------------------------------------------------
-    // Step 2: POST to ComfyUI /prompt
-    // -------------------------------------------------------------------------
+    /**
+     * Turns on the correct boolean flags in the ClothesSegment node
+     * based on what type of clothing the user selected.
+     */
+    private void applyClothingType(ObjectNode node307inputs, String clothingType) {
+        // Reset all to false first
+        node307inputs.put("Upper-clothes", false);
+        node307inputs.put("Dress", false);
+        node307inputs.put("Pants", false);
+        node307inputs.put("Skirt", false);
+        node307inputs.put("Scarf", false);
+
+        switch (clothingType.toUpperCase()) {
+            case "TOP"    -> node307inputs.put("Upper-clothes", true);
+            case "BOTTOM" -> {
+                node307inputs.put("Pants", true);
+                node307inputs.put("Skirt", true);
+            }
+            case "DRESS"  -> node307inputs.put("Dress", true);
+            default       -> node307inputs.put("Upper-clothes", true); // fallback
+        }
+    }
+
+    // --- Step 2: POST the workflow to ComfyUI ---
 
     private String submitPrompt(ObjectNode workflow) {
         Map<String, Object> payload = Map.of(
@@ -75,7 +105,7 @@ public class ComfyUiService {
             "client_id", props.getClientId()
         );
 
-        JsonNode response = webClient.post()
+        JsonNode response = comfyUiWebClient.post()
             .uri("/prompt")
             .bodyValue(payload)
             .retrieve()
@@ -89,9 +119,7 @@ public class ComfyUiService {
         return response.get("prompt_id").asText();
     }
 
-    // -------------------------------------------------------------------------
-    // Step 3: Poll GET /history/{promptId} until the job is done
-    // -------------------------------------------------------------------------
+    // --- Step 3: Poll /history until the job is done ---
 
     private String pollForOutputImage(String promptId) throws InterruptedException {
         int maxAttempts = props.getPolling().getMaxAttempts();
@@ -99,61 +127,47 @@ public class ComfyUiService {
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
             Thread.sleep(2000);
 
-            JsonNode history = webClient.get()
+            JsonNode history = comfyUiWebClient.get()
                 .uri("/history/{promptId}", promptId)
                 .retrieve()
                 .bodyToMono(JsonNode.class)
                 .block();
 
             if (history == null || !history.has(promptId)) {
-                log.debug("Poll attempt {}/{}: job not in history yet.", attempt, maxAttempts);
+                log.debug("Poll {}/{}: not ready yet.", attempt, maxAttempts);
                 continue;
             }
 
             JsonNode job = history.get(promptId);
-            JsonNode status = job.path("status");
-
-            if (status.path("completed").asBoolean(false)) {
-                String outputFilename = extractOutputFilename(job);
-                log.info("ComfyUI render complete. output={}", outputFilename);
-                return outputFilename;
+            if (job.path("status").path("completed").asBoolean(false)) {
+                String filename = extractOutputFilename(job);
+                log.info("Render complete. output={}", filename);
+                return filename;
             }
 
-            String statusStr = status.path("status_str").asText("running");
-            log.debug("Poll attempt {}/{}: status={}", attempt, maxAttempts, statusStr);
+            log.debug("Poll {}/{}: status={}", attempt, maxAttempts,
+                job.path("status").path("status_str").asText("running"));
         }
 
-        log.warn("ComfyUI polling timed out after {} attempts for prompt_id={}", maxAttempts, promptId);
+        log.warn("ComfyUI timed out after {} attempts for prompt_id={}", maxAttempts, promptId);
         return null;
     }
 
-    /**
-     * Extracts the first output image filename from the history response.
-     * Looks inside history[promptId].outputs[outputNodeId].images[0].filename
-     */
     private String extractOutputFilename(JsonNode job) {
         String outputNodeId = props.getNode().getOutputNodeId();
-
-        JsonNode images = job.path("outputs")
-            .path(outputNodeId)
-            .path("images");
+        JsonNode images = job.path("outputs").path(outputNodeId).path("images");
 
         if (images.isArray() && !images.isEmpty()) {
             return images.get(0).path("filename").asText();
         }
 
         throw new IllegalStateException(
-            "ComfyUI job completed but no images found at outputs[" + outputNodeId + "]. " +
+            "Render finished but no image found at outputs[" + outputNodeId + "]. " +
             "Check comfyui.node.output-node-id in application.properties."
         );
     }
 
-    // -------------------------------------------------------------------------
-    // Utility: build the /view URL for a completed output image
-    // -------------------------------------------------------------------------
-
     public String buildViewUrl(String filename) {
         return props.getBaseUrl() + "/view?filename=" + filename + "&type=output";
     }
-
 }

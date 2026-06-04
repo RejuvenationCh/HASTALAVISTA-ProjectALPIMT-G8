@@ -1,19 +1,17 @@
 package dev.outfix.comfyui;
 
-import dev.outfix.dto.GenerateMockupRequest;
 import dev.outfix.dto.GenerateMockupResponse;
-import dev.outfix.entity.User;
-import dev.outfix.entity.Wardrobe;
-import dev.outfix.repository.UserRepository;
-import dev.outfix.repository.WardrobeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.security.Principal;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -22,65 +20,75 @@ import java.security.Principal;
 public class ComfyUiController {
 
     private final ComfyUiService comfyUiService;
-    private final UserRepository userRepository;
-    private final WardrobeRepository wardrobeRepository;
+    private final WebClient comfyUiWebClient;
 
     /**
-     * POST /api/mockup/generate
-     *
-     * Triggers a ComfyUI render for the authenticated user's face model
-     * paired with the selected wardrobe item. Returns the final image URL.
+     * POST /api/mockup/upload
+     * Proxies a multipart image upload to ComfyUI's /upload/image endpoint.
+     * The frontend calls this instead of hitting ComfyUI directly (avoids CORS).
+     * Returns: { "name": "filename.jpg" }
      */
-    @PostMapping("/generate")
-    public ResponseEntity<GenerateMockupResponse> generate(
-            @RequestBody GenerateMockupRequest request,
-            Principal principal) {
-
-        User user = userRepository.findByUsername(principal.getName())
-            .orElseThrow(() -> new IllegalStateException("Authenticated user not found."));
-
-        if (user.getFaceModelUrl() == null) {
-            return ResponseEntity.badRequest()
-                .body(GenerateMockupResponse.error("No face model uploaded. Please upload your face model first."));
-        }
-
-        Wardrobe item = wardrobeRepository.findById(request.getWardrobeItemId())
-            .orElseThrow(() -> new IllegalArgumentException("Wardrobe item not found."));
-
-        if (!item.getUser().getId().equals(user.getId())) {
-            return ResponseEntity.status(403)
-                .body(GenerateMockupResponse.error("Access denied."));
-        }
-
-        if (item.getClothingImageUrl() == null) {
-            return ResponseEntity.badRequest()
-                .body(GenerateMockupResponse.error("Selected wardrobe item has no image."));
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Map<String, String>> upload(@RequestParam("image") MultipartFile file) {
+        if (file.isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "No file provided."));
         }
 
         try {
-            // Extract just the filename — ComfyUI expects filenames relative to its input folder.
-            String faceFilename = toFilename(user.getFaceModelUrl());
-            String garmentFilename = toFilename(item.getClothingImageUrl());
+            MultipartBodyBuilder builder = new MultipartBodyBuilder();
+            builder.part("image", file.getResource());
+            builder.part("overwrite", "true");
 
-            String outputFilename = comfyUiService.generateMockup(faceFilename, garmentFilename);
+            Map<?, ?> comfyResponse = comfyUiWebClient.post()
+                .uri("/upload/image")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(builder.build()))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .block();
 
-            if (outputFilename == null) {
-                return ResponseEntity.ok(GenerateMockupResponse.timeout());
+            String filename = comfyResponse != null ? (String) comfyResponse.get("name") : null;
+            if (filename == null) {
+                return ResponseEntity.internalServerError().body(Map.of("error", "ComfyUI did not return a filename."));
             }
 
-            String viewUrl = comfyUiService.buildViewUrl(outputFilename);
-            return ResponseEntity.ok(GenerateMockupResponse.success(viewUrl));
+            return ResponseEntity.ok(Map.of("name", filename));
 
         } catch (Exception e) {
-            log.error("ComfyUI generation failed for user={}, wardrobeItem={}", user.getUsername(), request.getWardrobeItemId(), e);
+            log.error("Upload to ComfyUI failed", e);
+            return ResponseEntity.internalServerError().body(Map.of("error", "Upload failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/mockup/test
+     * Accepts filenames already uploaded to ComfyUI, runs the CatVTON pipeline,
+     * and returns the output image URL.
+     *
+     * Body: { "faceFilename": "...", "garmentFilename": "...", "clothingType": "TOP|BOTTOM|DRESS" }
+     */
+    @PostMapping("/test")
+    public ResponseEntity<GenerateMockupResponse> test(@RequestBody Map<String, String> body) {
+        String faceFilename    = body.get("faceFilename");
+        String garmentFilename = body.get("garmentFilename");
+        String clothingType    = body.getOrDefault("clothingType", "TOP");
+
+        if (faceFilename == null || garmentFilename == null) {
+            return ResponseEntity.badRequest()
+                .body(GenerateMockupResponse.error("faceFilename and garmentFilename are required."));
+        }
+
+        try {
+            String outputFilename = comfyUiService.generateMockup(faceFilename, garmentFilename, clothingType);
+
+            if (outputFilename == null) return ResponseEntity.ok(GenerateMockupResponse.timeout());
+
+            return ResponseEntity.ok(GenerateMockupResponse.success(comfyUiService.buildViewUrl(outputFilename)));
+
+        } catch (Exception e) {
+            log.error("Test generation failed", e);
             return ResponseEntity.internalServerError()
                 .body(GenerateMockupResponse.error("Generation failed: " + e.getMessage()));
         }
     }
-
-    private String toFilename(String url) {
-        Path path = Paths.get(url);
-        return path.getFileName().toString();
-    }
-
 }

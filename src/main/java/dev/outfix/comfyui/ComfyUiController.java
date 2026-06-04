@@ -1,18 +1,32 @@
 package dev.outfix.comfyui;
 
-import dev.outfix.dto.GenerateMockupResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.Map;
+
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.Map;
+import dev.outfix.dto.GenerateMockupResponse;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Handles HTTP requests for AI outfit mockup generation via ComfyUI.
+ * All endpoints require a valid JWT token.
+ *
+ * Typical client flow:
+ *   1. Upload images via POST /api/mockup/upload (once per image).
+ *   2. Use the returned filename to trigger generation via /test or /full.
+ *   3. The response contains an imageUrl pointing directly to the ComfyUI output.
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/mockup")
@@ -24,96 +38,147 @@ public class ComfyUiController {
 
     /**
      * POST /api/mockup/upload
-     * Proxies a multipart image upload to ComfyUI's /upload/image endpoint.
+     * Forwards an image file to ComfyUI's input folder.
+     * Must be called before /test or /full — ComfyUI needs filenames, not raw bytes.
+     *
+     * Send as multipart/form-data with a field named "image".
+     * Returns: { "name": "uploaded_filename.png" }
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, String>> upload(@RequestParam("image") MultipartFile file) {
+    public ResponseEntity<Map<String, String>> uploadImageToComfyUi(
+            @RequestParam("image") MultipartFile file) {
+
         if (file.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "No file provided."));
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "No file provided."));
         }
 
         try {
-            MultipartBodyBuilder builder = new MultipartBodyBuilder();
-            builder.part("image", file.getResource());
-            builder.part("overwrite", "true");
+            MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
+            bodyBuilder.part("image", file.getResource());
+            bodyBuilder.part("overwrite", "true");
 
             Map<?, ?> comfyResponse = comfyUiWebClient.post()
-                .uri("/upload/image")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(builder.build()))
-                .retrieve()
-                .bodyToMono(Map.class)
-                .block();
+                    .uri("/upload/image")
+                    .contentType(MediaType.MULTIPART_FORM_DATA)
+                    .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                    .retrieve()
+                    .bodyToMono(Map.class)
+                    .block();
 
-            String filename = comfyResponse != null ? (String) comfyResponse.get("name") : null;
-            if (filename == null) {
-                return ResponseEntity.internalServerError().body(Map.of("error", "ComfyUI did not return a filename."));
+            String uploadedFilename = comfyResponse != null
+                    ? (String) comfyResponse.get("name") : null;
+
+            if (uploadedFilename == null) {
+                return ResponseEntity.internalServerError()
+                        .body(Map.of("error", "ComfyUI did not return a filename."));
             }
 
-            return ResponseEntity.ok(Map.of("name", filename));
+            return ResponseEntity.ok(Map.of("name", uploadedFilename));
 
         } catch (Exception e) {
-            log.error("Upload to ComfyUI failed", e);
-            return ResponseEntity.internalServerError().body(Map.of("error", "Upload failed: " + e.getMessage()));
+            log.error("Image upload to ComfyUI failed", e);
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("error", "Upload failed: " + e.getMessage()));
         }
     }
 
     /**
      * POST /api/mockup/test
-     * Single garment try-on.
-     * Body: { "faceFilename", "garmentFilename", "clothingType": TOP|BOTTOM|DRESS }
+     * Single-garment virtual try-on. Replaces one clothing item on the face photo.
+     *
+     * Request body:
+     * {
+     *   "faceFilename":    "face.png",
+     *   "garmentFilename": "shirt.png",
+     *   "clothingType":    "TOP"        (TOP | BOTTOM | DRESS | SHOES)
+     * }
      */
     @PostMapping("/test")
-    public ResponseEntity<GenerateMockupResponse> test(@RequestBody Map<String, String> body) {
+    public ResponseEntity<GenerateMockupResponse> generateSingleGarment(
+            @RequestBody Map<String, String> body) {
+
         String faceFilename    = body.get("faceFilename");
         String garmentFilename = body.get("garmentFilename");
         String clothingType    = body.getOrDefault("clothingType", "TOP");
 
         if (faceFilename == null || garmentFilename == null) {
             return ResponseEntity.badRequest()
-                .body(GenerateMockupResponse.error("faceFilename and garmentFilename are required."));
+                    .body(GenerateMockupResponse.error(
+                            "faceFilename and garmentFilename are required."));
         }
 
         try {
-            String outputFilename = comfyUiService.generateMockup(faceFilename, garmentFilename, clothingType);
-            if (outputFilename == null) return ResponseEntity.ok(GenerateMockupResponse.timeout());
-            return ResponseEntity.ok(GenerateMockupResponse.success(comfyUiService.buildViewUrl(outputFilename)));
+            String outputFilename = comfyUiService.generateMockup(
+                    faceFilename, garmentFilename, clothingType);
+
+            if (outputFilename == null) {
+                return ResponseEntity.ok(GenerateMockupResponse.timeout());
+            }
+
+            return ResponseEntity.ok(
+                    GenerateMockupResponse.success(
+                            comfyUiService.buildViewUrl(outputFilename)));
+
         } catch (Exception e) {
             log.error("Single-garment generation failed", e);
             return ResponseEntity.internalServerError()
-                .body(GenerateMockupResponse.error("Generation failed: " + e.getMessage()));
+                    .body(GenerateMockupResponse.error(
+                            "Generation failed: " + e.getMessage()));
         }
     }
 
     /**
      * POST /api/mockup/full
-     * Full outfit try-on (top + bottom + shoes, 3 sequential CatVTON passes).
-     * Body: { "faceFilename", "topFilename", "bottomFilename", "shoesFilename" }
+     * Full outfit virtual try-on. Applies top, bottom, and shoes in three passes.
+     *
+     * Request body:
+     * {
+     *   "faceFilename":   "face.png",
+     *   "topFilename":    "shirt.png",
+     *   "bottomFilename": "pants.png",
+     *   "shoesFilename":  "shoes.png"
+     * }
      */
     @PostMapping("/full")
-    public ResponseEntity<GenerateMockupResponse> full(@RequestBody Map<String, String> body) {
+    public ResponseEntity<GenerateMockupResponse> generateFullOutfit(
+            @RequestBody Map<String, String> body) {
+
         String faceFilename   = body.get("faceFilename");
         String topFilename    = body.get("topFilename");
         String bottomFilename = body.get("bottomFilename");
         String shoesFilename  = body.get("shoesFilename");
 
-        if (faceFilename == null || topFilename == null || bottomFilename == null || shoesFilename == null) {
+        boolean anyFilenameIsMissing = faceFilename == null || topFilename == null
+                || bottomFilename == null || shoesFilename == null;
+
+        if (anyFilenameIsMissing) {
             return ResponseEntity.badRequest()
-                .body(GenerateMockupResponse.error("faceFilename, topFilename, bottomFilename, and shoesFilename are all required."));
+                    .body(GenerateMockupResponse.error(
+                            "faceFilename, topFilename, bottomFilename, "
+                            + "and shoesFilename are all required."));
         }
 
         try {
             String outputFilename = comfyUiService.generateFullOutfit(
-                faceFilename, topFilename, bottomFilename, shoesFilename);
-            if (outputFilename == null) return ResponseEntity.ok(GenerateMockupResponse.timeout());
-            return ResponseEntity.ok(GenerateMockupResponse.success(comfyUiService.buildViewUrl(outputFilename)));
+                    faceFilename, topFilename, bottomFilename, shoesFilename);
+
+            if (outputFilename == null) {
+                return ResponseEntity.ok(GenerateMockupResponse.timeout());
+            }
+
+            return ResponseEntity.ok(
+                    GenerateMockupResponse.success(
+                            comfyUiService.buildViewUrl(outputFilename)));
+
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError()
-                .body(GenerateMockupResponse.error(e.getMessage()));
+                    .body(GenerateMockupResponse.error(e.getMessage()));
         } catch (Exception e) {
             log.error("Full-outfit generation failed", e);
             return ResponseEntity.internalServerError()
-                .body(GenerateMockupResponse.error("Generation failed: " + e.getMessage()));
+                    .body(GenerateMockupResponse.error(
+                            "Generation failed: " + e.getMessage()));
         }
     }
 }

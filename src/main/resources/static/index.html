@@ -47,35 +47,85 @@
 
     .field-group {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
       margin-bottom: 1rem;
     }
 
-    .field-group.single { grid-template-columns: 1fr; }
+    /* Hidden native file input — triggered by clicking the upload zone */
+    input[type="file"] { display: none; }
 
-    label {
-      display: block;
+    .upload-zone {
+      position: relative;
+      border: 2px dashed #333;
+      border-radius: 10px;
+      overflow: hidden;
+      cursor: pointer;
+      aspect-ratio: 2 / 3;
+      background: #111;
+      transition: border-color 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .upload-zone:hover { border-color: #6366f1; }
+
+    .upload-zone.has-image { border-style: solid; border-color: #6366f1; }
+
+    .upload-zone .placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      color: #555;
+      pointer-events: none;
+    }
+
+    .upload-zone .placeholder svg {
+      width: 28px;
+      height: 28px;
+      stroke: #444;
+    }
+
+    .upload-zone .placeholder span {
+      font-size: 0.75rem;
+    }
+
+    .upload-zone .preview-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: none;
+    }
+
+    .upload-zone.has-image .preview-img { display: block; }
+    .upload-zone.has-image .placeholder { display: none; }
+
+    .upload-zone .change-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.04em;
+    }
+
+    .upload-zone.has-image:hover .change-overlay { display: flex; }
+
+    .field-label {
       font-size: 0.8rem;
       color: #aaa;
       margin-bottom: 0.35rem;
     }
-
-    input[type="text"],
-    input[type="file"] {
-      width: 100%;
-      background: #111;
-      border: 1px solid #333;
-      border-radius: 8px;
-      padding: 0.6rem 0.75rem;
-      color: #e5e5e5;
-      font-size: 0.875rem;
-      outline: none;
-      transition: border-color 0.15s;
-    }
-
-    input[type="text"]:focus,
-    input[type="file"]:focus { border-color: #6366f1; }
 
     button {
       background: #6366f1;
@@ -145,32 +195,75 @@
   <h1>Outfix — ComfyUI Test</h1>
   <p class="subtitle">Upload images, generate a full-outfit try-on, and see both outputs.</p>
 
-  <!-- Step 1: Image uploads + generate -->
   <div class="card">
     <h2>1. Upload Images &amp; Generate</h2>
     <div class="field-group">
+
       <div>
-        <label for="faceFile">Face / Body Photo</label>
-        <input type="file" id="faceFile" accept="image/*" />
+        <div class="field-label">Face / Body Photo</div>
+        <div class="upload-zone" onclick="document.getElementById('faceFile').click()">
+          <div class="placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16v-8m-4 4h8"/><rect x="3" y="3" width="18" height="18" rx="3"/>
+            </svg>
+            <span>Face / Body</span>
+          </div>
+          <img class="preview-img" alt="Face preview" />
+          <div class="change-overlay">Change</div>
+        </div>
+        <input type="file" id="faceFile" accept="image/*" onchange="setPreview(this, 'faceFile')" />
       </div>
+
       <div>
-        <label for="topFile">Top Garment</label>
-        <input type="file" id="topFile" accept="image/*" />
+        <div class="field-label">Top Garment</div>
+        <div class="upload-zone" onclick="document.getElementById('topFile').click()">
+          <div class="placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16v-8m-4 4h8"/><rect x="3" y="3" width="18" height="18" rx="3"/>
+            </svg>
+            <span>Top</span>
+          </div>
+          <img class="preview-img" alt="Top preview" />
+          <div class="change-overlay">Change</div>
+        </div>
+        <input type="file" id="topFile" accept="image/*" onchange="setPreview(this, 'topFile')" />
       </div>
+
       <div>
-        <label for="bottomFile">Bottom Garment</label>
-        <input type="file" id="bottomFile" accept="image/*" />
+        <div class="field-label">Bottom Garment</div>
+        <div class="upload-zone" onclick="document.getElementById('bottomFile').click()">
+          <div class="placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16v-8m-4 4h8"/><rect x="3" y="3" width="18" height="18" rx="3"/>
+            </svg>
+            <span>Bottom</span>
+          </div>
+          <img class="preview-img" alt="Bottom preview" />
+          <div class="change-overlay">Change</div>
+        </div>
+        <input type="file" id="bottomFile" accept="image/*" onchange="setPreview(this, 'bottomFile')" />
       </div>
+
       <div>
-        <label for="shoesFile">Shoes</label>
-        <input type="file" id="shoesFile" accept="image/*" />
+        <div class="field-label">Shoes</div>
+        <div class="upload-zone" onclick="document.getElementById('shoesFile').click()">
+          <div class="placeholder">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 16v-8m-4 4h8"/><rect x="3" y="3" width="18" height="18" rx="3"/>
+            </svg>
+            <span>Shoes</span>
+          </div>
+          <img class="preview-img" alt="Shoes preview" />
+          <div class="change-overlay">Change</div>
+        </div>
+        <input type="file" id="shoesFile" accept="image/*" onchange="setPreview(this, 'shoesFile')" />
       </div>
+
     </div>
     <button id="generateBtn" onclick="generate()">Upload &amp; Generate</button>
     <div id="status"></div>
   </div>
 
-  <!-- Step 3: Results -->
   <div id="results" class="results">
     <div class="result-box">
       <div class="label">JPG — Final Result</div>
@@ -183,22 +276,25 @@
   </div>
 
   <script>
+    function setPreview(input, inputId) {
+      const file = input.files[0];
+      if (!file) return;
+      const zone = input.previousElementSibling;
+      const img  = zone.querySelector('.preview-img');
+      img.src = URL.createObjectURL(file);
+      zone.classList.add('has-image');
+    }
+
     function setStatus(msg, type = '') {
       const el = document.getElementById('status');
       el.textContent = msg;
       el.className = type;
     }
 
-    /** Uploads one image file to ComfyUI via our backend proxy. Returns the filename. */
     async function uploadFile(file) {
       const form = new FormData();
       form.append('image', file);
-
-      const res = await fetch('/api/mockup/upload', {
-        method: 'POST',
-        body: form
-      });
-
+      const res = await fetch('/api/mockup/upload', { method: 'POST', body: form });
       if (!res.ok) throw new Error('Upload failed for: ' + file.name);
       const data = await res.json();
       return data.name;
@@ -220,7 +316,6 @@
       try {
         setStatus('Uploading 4 images to ComfyUI...');
 
-        // Upload all 4 images in parallel to save time
         const [faceName, topName, bottomName, shoesName] = await Promise.all([
           uploadFile(faceFile),
           uploadFile(topFile),
@@ -245,8 +340,13 @@
 
         if (data.status === 'success') {
           document.getElementById('jpgOutput').src = data.imageUrl;
-          document.getElementById('pngOutput').src = data.pngImageUrl;
-          document.getElementById('results').classList.add('visible');
+          if (data.pngImageUrl) {
+            document.getElementById('pngOutput').src = data.pngImageUrl;
+            document.getElementById('results').classList.add('visible');
+          } else {
+            document.getElementById('results').style.gridTemplateColumns = '1fr';
+            document.getElementById('results').classList.add('visible');
+          }
           setStatus('Generation complete.', 'success');
 
         } else if (data.status === 'timeout') {

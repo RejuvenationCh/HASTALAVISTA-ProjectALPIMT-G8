@@ -168,10 +168,9 @@ public class ComfyUiController {
                 return ResponseEntity.ok(GenerateMockupResponse.timeout());
             }
 
-            return ResponseEntity.ok(
-                    GenerateMockupResponse.successWithBoth(
-                            comfyUiService.buildViewUrl(result[0]),
-                            comfyUiService.buildViewUrl(result[1])));
+            String jpgUrl = comfyUiService.buildViewUrl(result[0]);
+            String pngUrl = result[1] != null ? comfyUiService.buildViewUrl(result[1]) : null;
+            return ResponseEntity.ok(GenerateMockupResponse.successWithBoth(jpgUrl, pngUrl));
 
         } catch (IllegalStateException e) {
             return ResponseEntity.internalServerError()

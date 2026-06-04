@@ -1,188 +1,544 @@
 {
-  "295": {
-    "inputs": { "image": "__FACE_IMAGE__" },
-    "class_type": "LoadImage",
-    "_meta": { "title": "Subject Image" }
-  },
-  "296": {
+  "131": {
     "inputs": {
-      "width": 512, "height": 768,
-      "interpolation": "nearest", "method": "keep proportion",
-      "condition": "always", "multiple_of": 0,
-      "image": ["295", 0]
+      "images": [
+        "183",
+        0
+      ]
     },
-    "class_type": "ImageResize+",
-    "_meta": { "title": "Subject Resize" }
-  },
-  "310": {
-    "inputs": { "image": "__TOP_IMAGE__" },
-    "class_type": "LoadImage",
-    "_meta": { "title": "Top" }
-  },
-  "298": {
-    "inputs": {
-      "width": 512, "height": 768,
-      "interpolation": "nearest", "method": "keep proportion",
-      "condition": "always", "multiple_of": 0,
-      "image": ["310", 0]
-    },
-    "class_type": "ImageResize+",
-    "_meta": { "title": "Top Resize" }
-  },
-  "311": {
-    "inputs": { "image": "__BOTTOM_IMAGE__" },
-    "class_type": "LoadImage",
-    "_meta": { "title": "Bottom" }
-  },
-  "314": {
-    "inputs": {
-      "width": 512, "height": 768,
-      "interpolation": "nearest", "method": "keep proportion",
-      "condition": "always", "multiple_of": 0,
-      "image": ["311", 0]
-    },
-    "class_type": "ImageResize+",
-    "_meta": { "title": "Bottom Resize" }
-  },
-  "312": {
-    "inputs": { "image": "__SHOES_IMAGE__" },
-    "class_type": "LoadImage",
-    "_meta": { "title": "Shoes" }
-  },
-  "317": {
-    "inputs": {
-      "width": 512, "height": 768,
-      "interpolation": "nearest", "method": "keep proportion",
-      "condition": "always", "multiple_of": 0,
-      "image": ["312", 0]
-    },
-    "class_type": "ImageResize+",
-    "_meta": { "title": "Shoes Resize" }
-  },
-  "307": {
-    "inputs": {
-      "Hat": false, "Hair": false, "Face": false, "Sunglasses": false,
-      "Upper-clothes": true, "Skirt": false, "Dress": true,
-      "Belt": false, "Pants": false,
-      "Left-arm": false, "Right-arm": false,
-      "Left-leg": false, "Right-leg": false,
-      "Bag": false, "Scarf": false,
-      "Left-shoe": false, "Right-shoe": false, "Background": false,
-      "process_res": 512, "mask_blur": 0, "mask_offset": 0,
-      "invert_output": false, "background": "Alpha",
-      "images": ["296", 0]
-    },
-    "class_type": "ClothesSegment",
-    "_meta": { "title": "RMBG - Top" }
-  },
-  "305": {
-    "inputs": {
-      "mask_grow": 5, "mixed_precision": "bf16",
-      "seed": 0, "steps": 40, "cfg": 2.5,
-      "image": ["296", 0],
-      "mask": ["307", 1],
-      "refer_image": ["298", 0]
-    },
-    "class_type": "CatVTONWrapper",
-    "_meta": { "title": "CatVTON Pass 1 - Top" }
-  },
-  "315": {
-    "inputs": {
-      "Hat": false, "Hair": false, "Face": false, "Sunglasses": false,
-      "Upper-clothes": false, "Skirt": true, "Dress": false,
-      "Belt": true, "Pants": true,
-      "Left-arm": false, "Right-arm": false,
-      "Left-leg": true, "Right-leg": true,
-      "Bag": false, "Scarf": false,
-      "Left-shoe": false, "Right-shoe": false, "Background": false,
-      "process_res": 512, "mask_blur": 0, "mask_offset": 0,
-      "invert_output": false, "background": "Alpha",
-      "images": ["305", 0]
-    },
-    "class_type": "ClothesSegment",
-    "_meta": { "title": "RMBG - Bottom" }
-  },
-  "316": {
-    "inputs": {
-      "mask_grow": 2, "mixed_precision": "bf16",
-      "seed": 0, "steps": 40, "cfg": 2.5,
-      "image": ["305", 0],
-      "mask": ["315", 1],
-      "refer_image": ["314", 0]
-    },
-    "class_type": "CatVTONWrapper",
-    "_meta": { "title": "CatVTON Pass 2 - Bottom" }
-  },
-  "319": {
-    "inputs": {
-      "Hat": false, "Hair": false, "Face": false, "Sunglasses": false,
-      "Upper-clothes": false, "Skirt": false, "Dress": false,
-      "Belt": false, "Pants": false,
-      "Left-arm": false, "Right-arm": false,
-      "Left-leg": false, "Right-leg": false,
-      "Bag": false, "Scarf": false,
-      "Left-shoe": true, "Right-shoe": true, "Background": false,
-      "process_res": 512, "mask_blur": 0, "mask_offset": 0,
-      "invert_output": false, "background": "Alpha",
-      "images": ["316", 0]
-    },
-    "class_type": "ClothesSegment",
-    "_meta": { "title": "RMBG - Shoes" }
-  },
-  "318": {
-    "inputs": {
-      "mask_grow": 2, "mixed_precision": "bf16",
-      "seed": 0, "steps": 40, "cfg": 2.5,
-      "image": ["316", 0],
-      "mask": ["319", 1],
-      "refer_image": ["317", 0]
-    },
-    "class_type": "CatVTONWrapper",
-    "_meta": { "title": "CatVTON Pass 3 - Shoes" }
-  },
-  "299": {
-    "inputs": {
-      "brightness": 1.07, "contrast": 1.02, "saturation": 0.95,
-      "R": 0, "G": 0, "B": 0,
-      "image": ["318", 0]
-    },
-    "class_type": "Color Grading JK",
-    "_meta": { "title": "Color Grading" }
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
   },
   "161": {
     "inputs": {
       "upscale_model": "4x-ClearRealityV1.pth",
-      "mode": "rescale", "rescale_factor": 2.0,
-      "resize_width": 1024, "resampling_method": "nearest",
-      "supersample": "true", "rounding_modulus": 8,
-      "image": ["299", 0]
+      "mode": "rescale",
+      "rescale_factor": 2.0000000000000004,
+      "resize_width": 1024,
+      "resampling_method": "nearest",
+      "supersample": "true",
+      "rounding_modulus": 8,
+      "image": [
+        "299",
+        0
+      ]
     },
     "class_type": "CR Upscale Image",
-    "_meta": { "title": "Upscale 2x" }
-  },
-  "184": {
-    "inputs": { "width": 1024, "height": 1536 },
-    "class_type": "BMAB Noise Generator",
-    "_meta": { "title": "Noise Generator" }
-  },
-  "183": {
-    "inputs": {
-      "blend_factor": 0.07, "blend_mode": "overlay",
-      "image1": ["161", 0], "image2": ["184", 0]
-    },
-    "class_type": "ImageBlend",
-    "_meta": { "title": "Image Blend" }
+    "_meta": {
+      "title": "🔍 CR Upscale Image"
+    }
   },
   "163": {
     "inputs": {
       "output_type": "Save",
-      "filename_prefix": "outfix",
+      "filename_prefix": "CR_JPEG",
       "prefix_presets": "yyyyMMdd",
       "file_format": "jpg",
       "trigger": true,
-      "images": ["183", 0]
+      "images": [
+        "183",
+        0
+      ]
     },
     "class_type": "CR Image Output",
-    "_meta": { "title": "Final Output" }
+    "_meta": {
+      "title": "💾 CR Image Output"
+    }
+  },
+  "183": {
+    "inputs": {
+      "blend_factor": 0.030000000000000006,
+      "blend_mode": "overlay",
+      "image1": [
+        "161",
+        0
+      ],
+      "image2": [
+        "184",
+        0
+      ]
+    },
+    "class_type": "ImageBlend",
+    "_meta": {
+      "title": "Image Blend"
+    }
+  },
+  "184": {
+    "inputs": {
+      "width": 1024,
+      "height": 1536
+    },
+    "class_type": "BMAB Noise Generator",
+    "_meta": {
+      "title": "BMAB Noise Generator"
+    }
+  },
+  "236": {
+    "inputs": {
+      "images": [
+        "161",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "295": {
+    "inputs": {
+      "image": "1000294168.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Subject Image"
+    }
+  },
+  "296": {
+    "inputs": {
+      "width": 512,
+      "height": 768,
+      "interpolation": "nearest",
+      "method": "keep proportion",
+      "condition": "always",
+      "multiple_of": 0,
+      "image": [
+        "295",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "Subject Resize"
+    }
+  },
+  "298": {
+    "inputs": {
+      "width": 512,
+      "height": 768,
+      "interpolation": "nearest",
+      "method": "keep proportion",
+      "condition": "always",
+      "multiple_of": 0,
+      "image": [
+        "310",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "Top Resize"
+    }
+  },
+  "299": {
+    "inputs": {
+      "brightness": 1.0700000000000003,
+      "contrast": 1.0200000000000002,
+      "saturation": 0.9500000000000002,
+      "R": 0,
+      "G": 0,
+      "B": 0,
+      "image": [
+        "318",
+        0
+      ]
+    },
+    "class_type": "Color Grading JK",
+    "_meta": {
+      "title": "Color Grading JK🐉"
+    }
+  },
+  "305": {
+    "inputs": {
+      "mask_grow": 5,
+      "mixed_precision": "bf16",
+      "seed": 1012912932308363,
+      "steps": 40,
+      "cfg": 2.5,
+      "image": [
+        "296",
+        0
+      ],
+      "mask": [
+        "307",
+        1
+      ],
+      "refer_image": [
+        "298",
+        0
+      ]
+    },
+    "class_type": "CatVTONWrapper",
+    "_meta": {
+      "title": "CatVTON Wrapper"
+    }
+  },
+  "307": {
+    "inputs": {
+      "Hat": false,
+      "Hair": false,
+      "Face": false,
+      "Sunglasses": false,
+      "Upper-clothes": true,
+      "Skirt": false,
+      "Dress": true,
+      "Belt": false,
+      "Pants": false,
+      "Left-arm": false,
+      "Right-arm": false,
+      "Left-leg": false,
+      "Right-leg": false,
+      "Bag": true,
+      "Scarf": true,
+      "Left-shoe": false,
+      "Right-shoe": false,
+      "Background": false,
+      "process_res": 512,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "background": "Alpha",
+      "images": [
+        "296",
+        0
+      ]
+    },
+    "class_type": "ClothesSegment",
+    "_meta": {
+      "title": "Clothing Segmentation (RMBG)"
+    }
+  },
+  "310": {
+    "inputs": {
+      "image": "CSC00390.JPG"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Top"
+    }
+  },
+  "311": {
+    "inputs": {
+      "image": "1000294176.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Bottom"
+    }
+  },
+  "312": {
+    "inputs": {
+      "image": "1000294186.jpg"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Shoes"
+    }
+  },
+  "314": {
+    "inputs": {
+      "width": 512,
+      "height": 768,
+      "interpolation": "nearest",
+      "method": "keep proportion",
+      "condition": "always",
+      "multiple_of": 0,
+      "image": [
+        "311",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "Bottom Resize"
+    }
+  },
+  "315": {
+    "inputs": {
+      "Hat": false,
+      "Hair": false,
+      "Face": false,
+      "Sunglasses": false,
+      "Upper-clothes": false,
+      "Skirt": true,
+      "Dress": false,
+      "Belt": true,
+      "Pants": true,
+      "Left-arm": false,
+      "Right-arm": false,
+      "Left-leg": true,
+      "Right-leg": true,
+      "Bag": false,
+      "Scarf": false,
+      "Left-shoe": false,
+      "Right-shoe": false,
+      "Background": false,
+      "process_res": 512,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "background": "Alpha",
+      "images": [
+        "305",
+        0
+      ]
+    },
+    "class_type": "ClothesSegment",
+    "_meta": {
+      "title": "Clothing Segmentation (RMBG)"
+    }
+  },
+  "316": {
+    "inputs": {
+      "mask_grow": 2,
+      "mixed_precision": "bf16",
+      "seed": 261690456369629,
+      "steps": 40,
+      "cfg": 2.5,
+      "image": [
+        "305",
+        0
+      ],
+      "mask": [
+        "315",
+        1
+      ],
+      "refer_image": [
+        "314",
+        0
+      ]
+    },
+    "class_type": "CatVTONWrapper",
+    "_meta": {
+      "title": "CatVTON Wrapper"
+    }
+  },
+  "317": {
+    "inputs": {
+      "width": 512,
+      "height": 768,
+      "interpolation": "nearest",
+      "method": "keep proportion",
+      "condition": "always",
+      "multiple_of": 0,
+      "image": [
+        "312",
+        0
+      ]
+    },
+    "class_type": "ImageResize+",
+    "_meta": {
+      "title": "Shoes"
+    }
+  },
+  "318": {
+    "inputs": {
+      "mask_grow": 2,
+      "mixed_precision": "bf16",
+      "seed": 1020423156542483,
+      "steps": 40,
+      "cfg": 2.5,
+      "image": [
+        "316",
+        0
+      ],
+      "mask": [
+        "319",
+        1
+      ],
+      "refer_image": [
+        "317",
+        0
+      ]
+    },
+    "class_type": "CatVTONWrapper",
+    "_meta": {
+      "title": "CatVTON Wrapper"
+    }
+  },
+  "319": {
+    "inputs": {
+      "Hat": false,
+      "Hair": false,
+      "Face": false,
+      "Sunglasses": false,
+      "Upper-clothes": false,
+      "Skirt": false,
+      "Dress": false,
+      "Belt": false,
+      "Pants": false,
+      "Left-arm": false,
+      "Right-arm": false,
+      "Left-leg": false,
+      "Right-leg": false,
+      "Bag": false,
+      "Scarf": false,
+      "Left-shoe": true,
+      "Right-shoe": true,
+      "Background": false,
+      "process_res": 512,
+      "mask_blur": 0,
+      "mask_offset": 0,
+      "invert_output": false,
+      "background": "Alpha",
+      "images": [
+        "316",
+        0
+      ]
+    },
+    "class_type": "ClothesSegment",
+    "_meta": {
+      "title": "Clothing Segmentation (RMBG)"
+    }
+  },
+  "320": {
+    "inputs": {
+      "images": [
+        "305",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "321": {
+    "inputs": {
+      "images": [
+        "316",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "322": {
+    "inputs": {
+      "mask": [
+        "307",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "323": {
+    "inputs": {
+      "images": [
+        "307",
+        2
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "326": {
+    "inputs": {
+      "images": [
+        "315",
+        2
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "327": {
+    "inputs": {
+      "mask": [
+        "315",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "328": {
+    "inputs": {
+      "mask": [
+        "319",
+        1
+      ]
+    },
+    "class_type": "MaskPreview+",
+    "_meta": {
+      "title": "🔧 Mask Preview"
+    }
+  },
+  "329": {
+    "inputs": {
+      "images": [
+        "319",
+        2
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "Preview Image"
+    }
+  },
+  "330": {
+    "inputs": {
+      "Hat": false,
+      "Hair": false,
+      "Face": false,
+      "Sunglasses": false,
+      "Upper-clothes": false,
+      "Skirt": false,
+      "Dress": false,
+      "Belt": false,
+      "Pants": false,
+      "Left-arm": false,
+      "Right-arm": false,
+      "Left-leg": false,
+      "Right-leg": false,
+      "Bag": false,
+      "Scarf": false,
+      "Left-shoe": false,
+      "Right-shoe": false,
+      "Background": true,
+      "process_res": 512,
+      "mask_blur": 3,
+      "mask_offset": 0,
+      "invert_output": true,
+      "background": "Alpha",
+      "images": [
+        "183",
+        0
+      ]
+    },
+    "class_type": "ClothesSegment",
+    "_meta": {
+      "title": "Clothing Segmentation (RMBG)"
+    }
+  },
+  "331": {
+    "inputs": {
+      "output_type": "Save",
+      "filename_prefix": "CR_PNG",
+      "prefix_presets": "yyyyMMdd",
+      "file_format": "png",
+      "trigger": true,
+      "images": [
+        "330",
+        0
+      ]
+    },
+    "class_type": "CR Image Output",
+    "_meta": {
+      "title": "💾 CR Image Output"
+    }
   }
 }

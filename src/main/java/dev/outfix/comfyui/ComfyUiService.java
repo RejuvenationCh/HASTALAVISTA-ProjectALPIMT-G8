@@ -286,7 +286,7 @@ public class ComfyUiService {
 
             if (isComplete) {
                 String jpgFilename = extractOutputFilename(jobResult, jpgNodeId);
-                String pngFilename = extractOutputFilename(jobResult, pngNodeId);
+                String pngFilename = tryExtractOutputFilename(jobResult, pngNodeId);
                 log.info("Full-outfit render complete. jpg={}, png={}", jpgFilename, pngFilename);
                 return new String[]{ jpgFilename, pngFilename };
             }
@@ -300,18 +300,23 @@ public class ComfyUiService {
         return new String[]{ null, null };
     }
 
-    /** Reads the output image filename from the completed job's history entry. */
+    /** Reads the output image filename from the completed job's history entry. Throws if missing. */
     private String extractOutputFilename(JsonNode jobResult, String outputNodeId) {
-        JsonNode outputImages = jobResult.path("outputs")
-                .path(outputNodeId).path("images");
-
-        if (outputImages.isArray() && !outputImages.isEmpty()) {
-            return outputImages.get(0).path("filename").asText();
-        }
-
+        String filename = tryExtractOutputFilename(jobResult, outputNodeId);
+        if (filename != null) return filename;
         throw new IllegalStateException(
                 "Render finished but no image found at outputs[" + outputNodeId + "]. "
                 + "Check comfyui.node.output-node-id in application.properties.");
+    }
+
+    /** Like extractOutputFilename but returns null instead of throwing when the node is absent. */
+    private String tryExtractOutputFilename(JsonNode jobResult, String outputNodeId) {
+        JsonNode outputImages = jobResult.path("outputs")
+                .path(outputNodeId).path("images");
+        if (outputImages.isArray() && !outputImages.isEmpty()) {
+            return outputImages.get(0).path("filename").asText();
+        }
+        return null;
     }
 
     /**

@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Outfix - Generate</title>
+    <title>Outfix - My Account</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" href="/css/style.css">
 </head>
-<body>
+<body class="account-body">
     <header class="navbar">
         <div class="logo">
             <a href="index.html"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
@@ -24,10 +24,32 @@
         </div>
     </header>
 
-    <main class="generate-section">
-        <img src="/image/GENERATE YOURS.jpg" alt="Generate Yours" class="generate-banner">
+    <main class="account-container">
+        <h1>My Account</h1>
         
-        <button class="create-now-btn auth-trigger">Create Now</button>
+        <div class="account-card">
+            <div class="account-card-header">
+                <div class="account-card-text">
+                    <h3>Get the most out of your visit</h3>
+                    <p>Log in or sign up to access the complete set of website features.</p>
+                </div>
+                <div class="account-actions">
+                    <button class="btn-outline auth-trigger">Login</button>
+                    <button class="btn-solid auth-trigger">Signup</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="account-card">
+            <div class="account-card-text">
+                <h3>My Mix (0)</h3>
+            </div>
+            <div class="mix-empty-state">
+                <i class="fa-solid fa-box-archive"></i>
+                <p><strong>No Mixing found</strong></p>
+                <p>Mix an Wardrobe to see it listed here.</p>
+            </div>
+        </div>
     </main>
 
     <div id="auth-modal" class="modal-overlay">

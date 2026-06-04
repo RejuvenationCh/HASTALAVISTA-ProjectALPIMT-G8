@@ -12,7 +12,9 @@ body {
     overflow-x: hidden; 
 }
 
-/* Navbar Styles */
+/* =========================================
+   NAVBAR STYLES
+   ========================================= */
 .navbar {
     position: sticky;
     top: 0;
@@ -26,12 +28,11 @@ body {
 }
 
 .logo img {
-    height: 100px; /* Reduced slightly to match Figma proportions */
+    height: 100px;
     width: auto;
     vertical-align: middle;
 }
 
-/* Centered navigation */
 .nav-links {
     display: flex;
     gap: 40px;
@@ -53,12 +54,6 @@ body {
     color: #666; 
 }
 
-.nav-links span {
-    font-size: 10px;
-    vertical-align: middle;
-    margin-left: 2px;
-}
-
 .nav-actions {
     display: flex;
     align-items: center;
@@ -73,7 +68,9 @@ body {
     color: #000;
 }
 
-/* Slider Section */
+/* =========================================
+   SLIDER SECTION (HOME)
+   ========================================= */
 .slider-container {
     position: relative;
     width: 100%;
@@ -105,7 +102,6 @@ body {
     object-position: center; 
 }
 
-/* Slider arrows */
 .slider-btn {
     position: absolute;
     top: 50%;
@@ -124,19 +120,16 @@ body {
     color: #888;
 }
 
-.prev-btn {
-    left: 40px;
-}
+.prev-btn { left: 40px; }
+.next-btn { right: 40px; }
 
-.next-btn {
-    right: 40px;
-}
-
-/* About Section */
+/* =========================================
+   ABOUT SECTION (HOME)
+   ========================================= */
 .about-section {
     position: relative;
     overflow: hidden; 
-    padding: 120px 20px; /* Gives the section vertical breathing room */
+    padding: 120px 20px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -148,18 +141,13 @@ body {
     position: absolute;
     top: 50%;
     transform: translateY(-50%); 
-    height: 90%; /* Slightly scaled down so it doesn't touch edges */               
+    height: 90%;             
     z-index: 1;                 
     object-fit: contain;
 }
 
-.left-img {
-    left: -5%;  
-}
-
-.right-img {
-    right: -5%; 
-}
+.left-img { left: -5%; }
+.right-img { right: -5%; }
 
 .about-content {
     position: relative;
@@ -168,7 +156,6 @@ body {
     margin: 0 auto;
 }
 
-/* Flexbox to align the inline logo with the text */
 .about-content h2 {
     display: flex;
     align-items: center;
@@ -179,11 +166,10 @@ body {
     margin-bottom: 30px;
 }
 
-/* Styling for the placeholder inline logo */
 .about-logo-inline {
-    height: 54px; /* Matches the h2 font size */
+    height: 54px;
     width: auto;
-    margin: 0 10px; /* Space between words */
+    margin: 0 10px;
     object-fit: contain;
 }
 
@@ -201,7 +187,9 @@ body {
     letter-spacing: 1px;
 }
 
-/* Footer Section */
+/* =========================================
+   FOOTER SECTION
+   ========================================= */
 .site-footer {
     background-color: #1a1a1a; 
     color: #ffffff;
@@ -216,8 +204,6 @@ body {
     gap: 25px; 
     max-width: 800px;
     margin: 0 auto;
-    flex-wrap: wrap;
-    justify-content: center;
 }
 
 .school-logo {
@@ -234,506 +220,216 @@ body {
     margin-bottom: 12px;
 }
 
-/* ==========================================
-   RESPONSIVE STYLES (Mobile & Tablets)
-   ========================================== */
-@media screen and (max-width: 1024px) {
-    /* Styles inside here apply to screens smaller than 1024px */
-    
-    .navbar {
-        padding: 15px 20px; /* Bring navbar padding in so links don't squash */
-    }
-
-    .nav-links {
-        gap: 20px; /* Reduce space between links */
-    }
-}
-
-@media screen and (max-width: 768px) {
-    /* Styles inside here apply to mobile devices */
-    
-    /* 1. Turn Navbar links into a mobile stack or hide them */
-    .nav-links {
-        position: static;
-        transform: none;
-        gap: 15px;
-        font-size: 12px;
-    }
-    
-    /* 2. Fix the Slider height so it doesn't look stretched on mobile */
-    .slider-container {
-        height: 50vh; /* Shorter slider height for vertical phone screens */
-    }
-    
-    /* 3. FIX THE ABOUT SECTION (Crucial for your layout) */
-    .about-section {
-        flex-direction: column; /* Stack elements vertically instead of horizontally */
-        padding: 60px 20px;
-    }
-
-    .about-img {
-        position: relative; /* Remove from absolute positioning so they don't overlap text */
-        top: 0;
-        transform: none;
-        height: auto;
-        width: 80%; /* Let them take up width instead of height */
-        margin: 20px auto;
-    }
-
-    .left-img { left: 0; }
-    .right-img { right: 0; }
-
-    .about-content h2 {
-        font-size: 32px; /* Shrink giant headings so they don't wrap awkwardly */
-    }
-}
-
-img {
-    max-width: 100%;
-    height: auto;
-}
-
-/* ==========================================================================
-   WARDROBE DASHBOARD FRAMEWORK WORKSPACE
-   ========================================================================== */
-.wardrobe-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 60px 50px;
-    min-height: calc(100vh - 140px);
-}
-
-.wardrobe-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 40px;
-    border-bottom: 2px solid #000000;
-    padding-bottom: 25px;
-}
-
-.header-titles h1 {
-    font-size: 38px;
-    font-weight: 900;
-    letter-spacing: 2px;
-    margin-bottom: 5px;
-}
-
-.header-titles p {
-    font-size: 14px;
-    color: #666666;
-}
-
-/* Stylized + Button Action Switch */
-.add-item-trigger-btn {
-    background-color: #000000;
-    color: #ffffff;
-    border: 1px solid #000000;
-    padding: 14px 28px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    border-radius: 0px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    transition: all 0.3s ease;
-}
-
-.add-item-trigger-btn:hover {
-    background-color: #ffffff;
-    color: #000000;
-}
-
-/* Navigation Category Filter Selection Tabs row */
-.category-filters {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 40px;
-}
-
-.filter-tab {
-    background: none;
-    border: 1px solid #e5e5e5;
-    padding: 10px 24px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border-radius: 0px;
-    transition: all 0.2s ease;
-}
-
-.filter-tab:hover, .filter-tab.active {
-    background-color: #000000;
-    color: #ffffff;
-    border-color: #000000;
-}
-
-/* ==========================================================================
-   DYNAMIC APPAREL GRID SYSTEM & CARDS DISPLAY
-   ========================================================================== */
-.wardrobe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 35px;
-    width: 100%;
-}
-
-.empty-state-message {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 80px 0;
-    color: #888888;
-    font-size: 15px;
-    border: 1px dashed #cccccc;
-}
-
-/* Clothing Catalog Cards */
-.clothing-card {
-    position: relative;
-    background-color: #ffffff;
-    border: 1px solid #eeeeee;
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
-}
-
-.clothing-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
-}
-
-.card-image-wrap {
-    width: 100%;
-    aspect-ratio: 1 / 1;
-    background-color: #fafafa;
-    overflow: hidden;
-    margin-bottom: 15px;
-    position: relative;
-}
-
-.card-image-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
-}
-
-/* Floating Delete Button Badge Overlay */
-.delete-item-badge-btn {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: #ffffff;
-    color: #000000;
-    border: 1px solid #000000;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    opacity: 0;
-    transform: scale(0.8);
-    transition: all 0.2s cubic-bezier(0.25, 1, 0.5, 1);
-    z-index: 5;
-}
-
-.clothing-card:hover .delete-item-badge-btn {
-    opacity: 1;
-    transform: scale(1);
-}
-
-.delete-item-badge-btn:hover {
-    background-color: #000000;
-    color: #ffffff;
-}
-
-/* Card Metadata Copy Blocks */
-.card-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.card-details .item-tag {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: #888888;
-    letter-spacing: 0.5px;
-}
-
-.card-details h3 {
-    font-size: 15px;
-    font-weight: 700;
-    color: #000000;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.card-details .item-meta-color {
-    font-size: 12px;
-    color: #666666;
-}
-
-/* ==========================================================================
-   ADVANCED OVERLAY SPLIT-PANEL STYLING
-   ========================================================================== */
-.wardrobe-modal-card {
-    max-width: 750px !important; /* Expands bounds structural tracking for dual-column alignment */
-}
-
-.modal-split-layout {
-    display: flex;
-    gap: 40px;
-    margin-bottom: 30px;
-}
-
-.uploader-column {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-}
-
-.form-inputs-column {
-    flex: 1.2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.form-label {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-    color: #000000;
-}
-
-/* Interactive Drag Drop Box Target Frame */
-.image-upload-dropzone {
-    width: 100%;
-    flex-grow: 1;
-    min-height: 220px;
-    border: 2px dashed #000000;
-    background-color: #fafafa;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    cursor: pointer;
-    text-align: center;
-    padding: 20px;
-    transition: background-color 0.2s ease;
-}
-
-.image-upload-dropzone:hover {
-    background-color: #f1f1f1;
-}
-
-.dropzone-prompt .upload-icon {
-    font-size: 36px;
-    color: #444444;
-    margin-bottom: 12px;
-}
-
-.dropzone-prompt p {
-    font-size: 13px;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
-
-.dropzone-prompt span {
-    font-size: 11px;
-    color: #888888;
-}
-
-/* Live dynamic rendering preview element layout configurations */
-#upload-preview-img {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background-color: #ffffff;
-    z-index: 2;
-}
-
-.upload-preview-hidden {
-    display: none;
-}
-
-/* Secondary Selector tags configuration styling */
-select {
-    width: 100%;
-    padding: 12px 16px;
-    font-size: 14px;
-    border: 1px solid #000000;
-    background-color: #ffffff;
-    border-radius: 0px;
-    outline: none;
-    cursor: pointer;
-    appearance: none;
-    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 10 10'><path d='M0 3l5 5 5-5z'/></svg>");
-    background-repeat: no-repeat;
-    background-position: right 15px center;
-}
-
-/* Modal Bottom Action Footers Grid Arrangement */
-.modal-action-footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 15px;
-    border-top: 1px solid #eeeeee;
-    padding-top: 20px;
-}
-
-.auth-secondary-btn {
-    background-color: #ffffff;
-    color: #000000;
-    border: 1px solid #e5e5e5;
-    padding: 14px 35px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.auth-secondary-btn:hover {
-    border-color: #000000;
-}
-
-/* Responsive Dashboard Breaks */
-@media screen and (max-width: 768px) {
-    .wardrobe-container { padding: 40px 20px; }
-    .wardrobe-header { flex-direction: column; align-items: flex-start; gap: 20px; }
-    .add-item-trigger-btn { width: 100%; justify-content: center; }
-    .category-filters { overflow-x: auto; padding-bottom: 10px; width: 100%; }
-    .modal-split-layout { flex-direction: column; gap: 25px; }
-    .image-upload-dropzone { min-height: 180px; }
-}
-
-/* ==========================================================================
-   WARDROBE PAGE - ADD ITEM MODAL OVERLAY STYLES
-   ========================================================================== */
+/* =========================================
+   AUTHENTICATION OVERLAYS (MODAL)
+   ========================================= */
 .modal-overlay {
+    display: none; 
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.6); /* Dimmed background tint */
-    display: flex;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
     justify-content: center;
     align-items: center;
-    z-index: 2000;
-    
-    /* Completely hidden by default */
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
 }
 
-/* Activated State triggered via JavaScript .classList.add('active') */
-.modal-overlay.active {
-    opacity: 1;
-    pointer-events: auto;
-}
-
-/* The Modal Container Card Box */
-.modal-card {
-    background-color: #ffffff;
-    border: 2px solid #000000;
+.modal-content {
+    background-color: #fff;
     padding: 40px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
     position: relative;
-    width: 90%;
-    max-width: 750px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-    transform: translateY(-20px);
-    transition: transform 0.3s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
 }
 
-.modal-overlay.active .modal-card {
-    transform: translateY(0);
-}
-
-/* Close Exit button top-right cross icon layout position */
-.modal-close-x {
-    position: absolute;
-    top: 20px;
-    right: 25px;
-    background: none;
-    border: none;
-    font-size: 30px;
-    cursor: pointer;
-    color: #000000;
-    line-height: 1;
-    transition: color 0.2s ease;
-}
-
-.modal-close-x:hover {
-    color: #666666;
-}
-
-.auth-header {
-    margin-bottom: 30px;
-    border-bottom: 1px solid #eeeeee;
-    padding-bottom: 15px;
-}
-
-.auth-header h2 {
+.modal-content h2 {
     font-size: 24px;
-    font-weight: 900;
-    letter-spacing: 1.5px;
+    margin-bottom: 10px;
 }
 
-.auth-header p {
-    font-size: 13px;
-    color: #666666;
-    margin-top: 5px;
-}
-
-/* Form inputs styling layouts */
-.form-group {
+.modal-content p {
+    font-size: 12px;
+    color: #666;
     margin-bottom: 20px;
+    line-height: 1.4;
 }
 
-.form-group label {
-    display: block;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
 }
 
-.form-group input[type="text"] {
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.input-group input {
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
     font-size: 14px;
-    border: 1px solid #000000;
-    border-radius: 0px;
     outline: none;
 }
 
-.auth-primary-btn {
-    background-color: #000000;
-    color: #ffffff;
-    border: 1px solid #000000;
-    padding: 14px 35px;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
+.modal-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #b3b3b3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
     cursor: pointer;
-    transition: all 0.2s ease;
+    margin-top: 10px;
 }
 
-.auth-primary-btn:hover {
-    background-color: #ffffff;
-    color: #000000;
+.modal-btn:hover {
+    background-color: #999;
+}
+
+.toggle-auth {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.toggle-auth a {
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* =========================================
+   GENERATE PAGE STYLES
+   ========================================= */
+.generate-section {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 101px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+}
+
+.generate-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.create-now-btn {
+    position: absolute;
+    bottom: 25%; 
+    right: 15%; 
+    background-color: #222;
+    color: #fff;
+    padding: 15px 60px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.create-now-btn:hover {
+    background-color: #000;
+}
+
+/* =========================================
+   ACCOUNT PAGE STYLES
+   ========================================= */
+.account-body {
+    background-color: #f5f5f5;
+}
+
+.account-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.account-container h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.account-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.account-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.account-card-text h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.account-card-text p {
+    font-size: 13px;
+    color: #666;
+}
+
+.account-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-outline {
+    border: 1px solid #000;
+    background: transparent;
+    padding: 8px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-solid {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.mix-empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: #999;
+}
+
+.mix-empty-state i {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #ccc;
 }

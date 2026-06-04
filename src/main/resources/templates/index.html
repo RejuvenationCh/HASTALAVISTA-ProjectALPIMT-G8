@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Outfix</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo">
-            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+            <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
         <nav class="nav-links">
             <a href="/wardrobe">My Wardrobe</a>
@@ -34,13 +34,13 @@
     <main class="slider-container">
         <div class="slides-wrapper">
             <div class="slide">
-                <img src="/image/OUTFIX (1).jpg" alt="First Slide" class="full-slide-img">
+                <img th:src="@{/image/OUTFIX (1).jpg}" alt="First Slide" class="full-slide-img">
             </div>
             <div class="slide">
-                <img src="/image/OUTFIX (2).jpg" alt="Second Slide" class="full-slide-img">
+                <img th:src="@{/image/OUTFIX (2).jpg}" alt="Second Slide" class="full-slide-img">
             </div>
             <div class="slide">
-                <img src="/image/OUTFIX (3).jpg" alt="Last Slide" class="full-slide-img">
+                <img th:src="@{/image/OUTFIX (3).jpg}" alt="Last Slide" class="full-slide-img">
             </div>
         </div>
         <button class="slider-btn prev-btn">&#10094;</button>
@@ -48,21 +48,21 @@
     </main>
 
     <section class="about-section">
-        <img src="/image/IMAGE (LEFT).jpeg" alt="Grey Dress" class="about-img left-img">
+        <img th:src="@{/image/IMAGE (LEFT).jpeg}" alt="Grey Dress" class="about-img left-img">
         <div class="about-content">
-            <h2>ABOUT <img src="/image/LOGO.png" alt="O" class="about-logo-inline">OUTFIX.</h2>
+            <h2>ABOUT <img th:src="@{/image/LOGO.png}" alt="O" class="about-logo-inline">OUTFIX.</h2>
             <p><strong>Outfix.</strong> was created to help people spend less time overthinking what to wear every day.<br>
             By combining wardrobe management, daily agenda planning, and personalized outfit <br>
             recommendations, it helps users express their style <br>
             more efficiently and confidently.</p>
             <h3 class="vision-text">OUR VISION TO SIMPLIFY DAILY OUTFIT DECISION</h3>
         </div>
-        <img src="/image/IMAGE (RIGHT).jpeg" alt="Right Clothing Asset" class="about-img right-img">
+        <img th:src="@{/image/IMAGE (RIGHT).jpeg}" alt="Right Clothing Asset" class="about-img right-img">
     </section>
 
     <footer class="site-footer">
         <div class="footer-content">
-            <img src="/image/CIPUTRA.png" alt="Campus Logo" class="school-logo">
+            <img th:src="@{/image/CIPUTRA.png}" alt="Campus Logo" class="school-logo">
             <div class="footer-text">
                 <p>This website is a project made for Web Programming, Object Oriented Programming<br>
                 and Data Structure Class at Universitas Ciputra Surabaya, Kampus Kota<br>
@@ -116,8 +116,8 @@
         </div>
     </div>
 
-    <script src="/js/app.state.js"></script>
-    <script src="/js/api.service.js"></script>
-    <script src="/js/script.js"></script>
+    <script th:src="@{/js/app.state.js}"></script>
+    <script th:src="@{/js/api.service.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
 </body>
 </html>

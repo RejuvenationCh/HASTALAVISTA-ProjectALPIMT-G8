@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Outfix - My Wardrobe</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
-    <link rel="stylesheet" href="/css/wardrobe.css">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/wardrobe.css}">
 </head>
 <body>
 
     <header class="navbar">
         <div class="logo">
-            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+            <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
         <nav class="nav-links">
             <a href="/wardrobe" class="active">My Wardrobe</a>
@@ -100,7 +100,7 @@
                 <div class="add-modal-dropzone" id="dropzone-area" role="button" tabindex="0" aria-label="Click to upload clothing image">
                     <input type="file" id="clothing-file-input" accept="image/*" hidden>
                     <i class="fa-regular fa-image"></i>
-                    <p>Click to browse or drag & drop</p>
+                    <p>Click to browse or drag &amp; drop</p>
                     <span>Supports JPG, PNG, JPEG</span>
                     <img id="dropzone-preview" class="add-modal-dropzone-preview" src="" alt="Clothing preview">
                 </div>
@@ -150,8 +150,8 @@
     </div>
 
     <!-- Script load order matters: state → service → page logic -->
-    <script src="/js/app.state.js"></script>
-    <script src="/js/api.service.js"></script>
-    <script src="/js/wardrobe.js"></script>
+    <script th:src="@{/js/app.state.js}"></script>
+    <script th:src="@{/js/api.service.js}"></script>
+    <script th:src="@{/js/wardrobe.js}"></script>
 </body>
 </html>

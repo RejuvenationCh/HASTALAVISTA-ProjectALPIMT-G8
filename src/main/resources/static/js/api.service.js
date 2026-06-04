@@ -1,282 +1,217 @@
 /**
  * api.service.js — the ONLY file that knows about URLs and fetch().
+ * All mock data has been removed. Every call hits the real Spring Boot backend.
  *
- * Currently runs on MOCK data with simulated network delays.
- * To connect the real backend: set BASE_URL to your Spring Boot origin
- * and replace each mock Promise with the fetch() call shown in the comment above it.
- * No other file needs to change.
+ * Token is persisted in localStorage so it survives page navigations.
  */
 
 const BASE_URL = 'http://localhost:8080';
 
-// Simulates realistic async latency so loading states are testable.
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+// ── Token helpers ─────────────────────────────────────────────────────────────
+const getToken  = ()  => localStorage.getItem('outfix_token');
+const setToken  = (t) => localStorage.setItem('outfix_token', t);
+const clearToken = () => localStorage.removeItem('outfix_token');
 
-// ---------------------------------------------------------------------------
-// MOCK DATA STORE
-// In-memory arrays that act as a fake database for the session.
-// ---------------------------------------------------------------------------
-let _mockUsers = [
-    { id: 1, username: 'demo@outfix.com', password: 'password123', finishedTutorial: false }
-];
-let _mockSession = null; // { user, token }
+/** Sends a JSON request with the stored JWT. */
+async function request(method, path, body) {
+    const opts = {
+        method,
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${getToken()}`
+        }
+    };
+    if (body !== undefined) opts.body = JSON.stringify(body);
+    const res  = await fetch(BASE_URL + path, opts);
+    if (res.status === 204) return null;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || `Request failed (${res.status})`);
+    return data;
+}
 
-let _mockWardrobeItems = [
-    {
-        id: 'item_001',
-        userId: 1,
-        name: 'Napoli Padded Corduroy Zip Up Jacket',
-        category: 'Outerwear',
-        condition: 'Like New',
-        tokenFormalitas: 3,
-        tags: ['Men', 'Outerwear'],
-        imageSrc: ''
-    },
-    {
-        id: 'item_002',
-        userId: 1,
-        name: 'High Indigo Yellow Stripe Snapback',
-        category: 'Tops',
-        condition: 'Good',
-        tokenFormalitas: 2,
-        tags: ['Unisex', 'Tops'],
-        imageSrc: ''
-    },
-    {
-        id: 'item_003',
-        userId: 1,
-        name: 'Poison Ladies Loose Baggy Joggers',
-        category: 'Bottoms',
-        condition: 'New',
-        tokenFormalitas: 1,
-        tags: ['Women', 'Bottoms'],
-        imageSrc: ''
-    }
-];
+/** Sends a multipart/form-data request with the stored JWT. */
+async function upload(method, path, formData) {
+    const res  = await fetch(BASE_URL + path, {
+        method,
+        headers: { 'Authorization': `Bearer ${getToken()}` },
+        body: formData
+    });
+    if (res.status === 204) return null;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.message || `Upload failed (${res.status})`);
+    return data;
+}
 
-let _mockAgendas = [
-    {
-        id: 'agenda_001',
-        userId: 1,
-        activityName: 'Morning Lecture',
-        targetToken: 3,
-        targetTag: 'Tops',
-        date: '2026-06-10'
-    }
-];
+/** Maps a backend ClothingResponseDto → the shape wardrobe.js expects. */
+function toWardrobeItem(c) {
+    const tagArray = c.tags ? c.tags.split(',').map(t => t.trim()) : [];
+    return {
+        id:             c.id,
+        name:           tagArray.join(' · ') || 'Clothing item',
+        category:       tagArray[0] || '',
+        condition:      'N/A',
+        tokenFormalitas: c.tokenFormalitas,
+        tags:           tagArray,
+        imageSrc:       c.clothingImageUrl || ''
+    };
+}
 
-let _mockTags = {
-    categories: ['Tops', 'Bottoms', 'Outerwear', 'Shoes', 'Dresses', 'Activewear'],
-    conditions: ['New', 'Like New', 'Good', 'Fair', 'Worn']
-};
-
-// ---------------------------------------------------------------------------
-// AuthService
-// ---------------------------------------------------------------------------
+// ── AuthService ───────────────────────────────────────────────────────────────
 const AuthService = {
 
-    /**
-     * REAL: POST /api/auth/login  { username, password }
-     * Returns: { token: string, user: { id, username, finishedTutorial } }
-     */
-    login: async (username, password) => {
-        await delay(800);
-        const user = _mockUsers.find(u => u.username === username && u.password === password);
-        if (!user) throw new Error('Invalid credentials. Try demo@outfix.com / password123');
-        const token = 'mock-jwt-token-' + user.id;
-        _mockSession = { user, token };
-        return { token, user: { id: user.id, username: user.username, finishedTutorial: user.finishedTutorial } };
+    /** POST /api/auth/login  { email, password } */
+    login: async (email, password) => {
+        const res  = await fetch(BASE_URL + '/api/auth/login', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ email, password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Invalid credentials.');
+        setToken(data.token);
+        return {
+            token: data.token,
+            user: {
+                id:               data.userId,
+                username:         data.username,
+                finishedTutorial: data.finishedTutorial
+            }
+        };
     },
 
-    /**
-     * REAL: POST /api/auth/register  { username, password }
-     * Returns: { user: { id, username, finishedTutorial } }
-     */
-    register: async (username, password) => {
-        await delay(1000);
-        if (_mockUsers.find(u => u.username === username)) {
-            throw new Error('An account with this email already exists.');
-        }
-        const newUser = { id: Date.now(), username, password, finishedTutorial: false };
-        _mockUsers.push(newUser);
-        const token = 'mock-jwt-token-' + newUser.id;
-        _mockSession = { user: newUser, token };
-        return { token, user: { id: newUser.id, username: newUser.username, finishedTutorial: false } };
+    /** POST /api/auth/register  { username, email, password } */
+    register: async (username, email, password) => {
+        const res  = await fetch(BASE_URL + '/api/auth/register', {
+            method:  'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body:    JSON.stringify({ username, email, password })
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.message || 'Registration failed.');
+        setToken(data.token);
+        return {
+            token: data.token,
+            user: {
+                id:               data.userId,
+                username:         data.username,
+                finishedTutorial: data.finishedTutorial
+            }
+        };
     },
 
-    logout: () => {
-        _mockSession = null;
-    }
+    logout: () => clearToken()
 };
 
-// ---------------------------------------------------------------------------
-// UserService
-// ---------------------------------------------------------------------------
+// ── UserService ───────────────────────────────────────────────────────────────
 const UserService = {
 
-    /**
-     * REAL: PUT /api/user/tutorial/complete
-     * Returns: void
-     */
-    completeTutorial: async () => {
-        await delay(400);
-        if (_mockSession) _mockSession.user.finishedTutorial = true;
+    /** PATCH /api/users/tutorial */
+    completeTutorial: async () => request('PATCH', '/api/users/tutorial'),
+
+    /** POST /api/users/face-model  (multipart, field: "file") */
+    uploadFaceModel: async (file) => {
+        const fd = new FormData();
+        fd.append('file', file);
+        return upload('POST', '/api/users/face-model', fd);
     }
 };
 
-// ---------------------------------------------------------------------------
-// TagService
-// ---------------------------------------------------------------------------
+// ── TagService ────────────────────────────────────────────────────────────────
+// Real API returns a flat string array. We wrap it into the shape wardrobe.js
+// already expects: { categories: [...], conditions: [...] }.
+// Conditions are kept static because the backend has no condition concept.
+const _CONDITIONS = ['New', 'Like New', 'Good', 'Fair', 'Worn'];
+
 const TagService = {
 
-    /**
-     * REAL: GET /api/tags
-     * Returns: { categories: string[], conditions: string[] }
-     */
+    /** GET /api/tags → string[] */
     getTags: async () => {
-        await delay(300);
-        return { ..._mockTags };
+        const tags = await request('GET', '/api/tags');
+        return {
+            categories: Array.isArray(tags) ? tags : [],
+            conditions: _CONDITIONS
+        };
     }
 };
 
-// ---------------------------------------------------------------------------
-// WardrobeService
-// ---------------------------------------------------------------------------
+// ── WardrobeService (clothing items) ─────────────────────────────────────────
+// Maps to /api/clothing. Each item is an individual garment, not a saved outfit.
 const WardrobeService = {
 
-    /**
-     * REAL: GET /api/wardrobe
-     * Returns: WardrobeItem[]
-     */
+    /** GET /api/clothing */
     getItems: async () => {
-        await delay(700);
-        return [..._mockWardrobeItems];
+        const items = await request('GET', '/api/clothing');
+        return items.map(toWardrobeItem);
     },
 
     /**
-     * REAL: POST /api/wardrobe  (multipart/form-data)
-     * Returns: WardrobeItem
+     * POST /api/clothing  (multipart: file?, tokenFormalitas, tags)
+     * Accepts the same shape wardrobe.js sends, plus an optional `file` field.
      */
-    addItem: async (payload) => {
-        await delay(900);
-        const newItem = {
-            id: 'item_' + Date.now(),
-            userId: _mockSession ? _mockSession.user.id : 0,
-            name: payload.name,
-            category: payload.category,
-            condition: payload.condition,
-            tokenFormalitas: payload.tokenFormalitas,
-            tags: payload.tags || [],
-            imageSrc: payload.imageSrc || ''
-        };
-        _mockWardrobeItems.push(newItem);
-        return { ...newItem };
+    addItem: async ({ tokenFormalitas, tags, file }) => {
+        const fd = new FormData();
+        if (file) fd.append('file', file);
+        fd.append('tokenFormalitas', tokenFormalitas);
+        fd.append('tags', Array.isArray(tags) ? tags.join(',') : tags);
+        const item = await upload('POST', '/api/clothing', fd);
+        return toWardrobeItem(item);
     },
 
-    /**
-     * REAL: DELETE /api/wardrobe/:id
-     * Returns: void
-     */
-    deleteItem: async (id) => {
-        await delay(400);
-        const idx = _mockWardrobeItems.findIndex(i => i.id === id);
-        if (idx === -1) throw new Error('Item not found.');
-        _mockWardrobeItems.splice(idx, 1);
-    }
+    /** DELETE /api/clothing/{id} */
+    deleteItem: async (id) => request('DELETE', `/api/clothing/${id}`)
 };
 
-// ---------------------------------------------------------------------------
-// AgendaService
-// ---------------------------------------------------------------------------
+// ── AgendaService (schedules) ─────────────────────────────────────────────────
+// Maps to /api/schedules. Named AgendaService for front-end compatibility.
 const AgendaService = {
 
-    /**
-     * REAL: GET /api/agenda
-     * Returns: Agenda[]
-     */
-    getAgendas: async () => {
-        await delay(600);
-        return [..._mockAgendas];
+    /** GET /api/schedules */
+    getAgendas: async () => request('GET', '/api/schedules'),
+
+    /** POST /api/schedules  { activityName, targetToken, targetTag, dresscode? } */
+    addAgenda: async ({ activityName, targetToken, targetTag, dresscode }) => {
+        return request('POST', '/api/schedules', {
+            activityName, targetToken, targetTag, dresscode: dresscode || null
+        });
     },
 
-    /**
-     * REAL: POST /api/agenda  { activityName, targetToken, targetTag, date }
-     * Returns: Agenda
-     */
-    addAgenda: async (payload) => {
-        await delay(700);
-        const newAgenda = {
-            id: 'agenda_' + Date.now(),
-            userId: _mockSession ? _mockSession.user.id : 0,
-            activityName: payload.activityName,
-            targetToken: payload.targetToken,
-            targetTag: payload.targetTag,
-            date: payload.date
-        };
-        _mockAgendas.push(newAgenda);
-        return { ...newAgenda };
-    },
+    /** DELETE /api/schedules/{id} */
+    deleteAgenda: async (id) => request('DELETE', `/api/schedules/${id}`),
 
-    /**
-     * REAL: DELETE /api/agenda/:id
-     * Returns: void
-     */
-    deleteAgenda: async (id) => {
-        await delay(400);
-        const idx = _mockAgendas.findIndex(a => a.id === id);
-        if (idx === -1) throw new Error('Agenda not found.');
-        _mockAgendas.splice(idx, 1);
-    },
-
-    /**
-     * REAL: GET /api/agenda/:id/recommendation
-     * Runs the formality-token + tag-intersection query and returns matched wardrobe items.
-     * Returns: { status: 'ok'|'empty', items: WardrobeItem[], action?: 'suggest_input' }
-     */
-    getRecommendation: async (agendaId) => {
-        await delay(800);
-        const agenda = _mockAgendas.find(a => a.id === agendaId);
-        if (!agenda) throw new Error('Agenda not found.');
-
-        const matched = _mockWardrobeItems.filter(item =>
-            item.tokenFormalitas === agenda.targetToken &&
-            item.tags.includes(agenda.targetTag)
-        );
-
-        if (matched.length === 0) {
-            return { status: 'empty', items: [], action: 'suggest_input' };
-        }
-        return { status: 'ok', items: matched };
-    }
+    /** GET /api/recommendation/{scheduleId} */
+    getRecommendation: async (agendaId) => request('GET', `/api/recommendation/${agendaId}`)
 };
 
-// ---------------------------------------------------------------------------
-// GenerateService
-// ---------------------------------------------------------------------------
+// ── GenerateService ───────────────────────────────────────────────────────────
 const GenerateService = {
 
     /**
-     * REAL: POST /api/generate/prompt  { faceModelUrl, garmentUrl }
-     * Triggers the ComfyUI pipeline via Spring Boot WebClient.
-     * Returns: { promptId: string }
+     * POST /api/mockup/upload  (multipart, field: "image")
+     * Returns: { name: "filename.png" }
      */
-    submitPrompt: async (faceModelUrl, garmentUrl) => {
-        await delay(1200);
-        const promptId = 'prompt_mock_' + Date.now();
-        return { promptId };
+    uploadImage: async (file) => {
+        const fd = new FormData();
+        fd.append('image', file);
+        return upload('POST', '/api/mockup/upload', fd);
     },
 
     /**
-     * REAL: GET /api/generate/result/:promptId
-     * Polls ComfyUI /history endpoint via Spring Boot proxy.
-     * Returns: { status: 'pending'|'complete'|'error', imageUrl?: string }
+     * POST /api/mockup/test  { faceFilename, garmentFilename, clothingType }
+     * Single-garment virtual try-on.
      */
-    pollResult: async (promptId) => {
-        // Mock: always resolves as complete after one poll with a placeholder image.
-        await delay(2000);
-        return {
-            status: 'complete',
-            imageUrl: 'https://placehold.co/600x800/1a1a1a/ffffff?text=Generated+Outfit'
-        };
+    submitPrompt: async (faceFilename, garmentFilename, clothingType = 'TOP') => {
+        return request('POST', '/api/mockup/test', {
+            faceFilename, garmentFilename, clothingType
+        });
+    },
+
+    /**
+     * POST /api/mockup/full  { faceFilename, topFilename, bottomFilename, shoesFilename }
+     * Full outfit try-on.
+     */
+    generateFullOutfit: async (faceFilename, topFilename, bottomFilename, shoesFilename) => {
+        return request('POST', '/api/mockup/full', {
+            faceFilename, topFilename, bottomFilename, shoesFilename
+        });
     }
 };

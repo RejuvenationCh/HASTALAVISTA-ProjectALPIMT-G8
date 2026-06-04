@@ -340,7 +340,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 condition,
                 tokenFormalitas: formality,
                 tags: [category],
-                imageSrc: uploadedImageSrc
+                imageSrc: uploadedImageSrc,
+                file: fileInput.files[0] || null
             });
 
             AppState.wardrobe.items.unshift(newItem);

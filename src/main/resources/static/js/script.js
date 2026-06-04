@@ -321,7 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const {
                     token,
                     user
-                } = await AuthService.register(email, password);
+                } = await AuthService.register(name, email, password);
                 AppState.auth.isLoggedIn = true;
                 AppState.auth.user = user;
                 AppState.auth.token = token;

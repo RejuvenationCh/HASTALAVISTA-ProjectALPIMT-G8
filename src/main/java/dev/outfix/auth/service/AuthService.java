@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import dev.outfix.auth.dto.AuthResponseDto;
@@ -24,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
@@ -42,7 +40,7 @@ public class AuthService {
         User newUser = User.builder()
                 .username(request.getUsername())
                 .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .password(request.getPassword())
                 .role("USER")
                 .createdAt(LocalDateTime.now())
                 .build();

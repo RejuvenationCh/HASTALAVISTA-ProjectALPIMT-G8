@@ -19,4 +19,7 @@ public class UpdateScheduleRequestDto {
 
     /** New required tag. Leave null to keep the current value. */
     private String targetTag;
+
+    /** New dresscode. Leave null to keep the current value. Pass empty string "" to clear it. */
+    private String dresscode;
 }

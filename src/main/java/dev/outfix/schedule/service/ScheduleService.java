@@ -30,6 +30,7 @@ public class ScheduleService {
                 .activityName(request.getActivityName())
                 .targetToken(request.getTargetToken())
                 .targetTag(request.getTargetTag())
+                .dresscode(request.getDresscode())
                 .build();
         return scheduleRepository.save(newSchedule);
     }
@@ -75,6 +76,10 @@ public class ScheduleService {
         }
         if (request.getTargetTag() != null) {
             schedule.setTargetTag(request.getTargetTag());
+        }
+        if (request.getDresscode() != null) {
+            // empty string is treated as "clear the dresscode"
+            schedule.setDresscode(request.getDresscode().isBlank() ? null : request.getDresscode());
         }
 
         return scheduleRepository.save(schedule);

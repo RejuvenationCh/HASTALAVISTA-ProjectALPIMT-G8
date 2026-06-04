@@ -56,4 +56,11 @@ public class Schedule {
      */
     @Column(name = "target_tag")
     private String targetTag;
+
+    /**
+     * Optional specific dresscode required for this activity (e.g. "Batik", "Sportswear").
+     * Null means no special dresscode — formality token and category tag are sufficient.
+     */
+    @Column(name = "dresscode")
+    private String dresscode;
 }

@@ -20,7 +20,10 @@ public class CreateScheduleRequestDto {
     @Min(1)
     private int targetToken;
 
-    /** The clothing category needed for this activity (e.g. "Men", "Formal"). */
+    /** The clothing category needed for this activity (e.g. "Top", "Bottom"). */
     @NotBlank
     private String targetTag;
+
+    /** Optional dresscode for this activity (e.g. "Batik", "Sportswear"). Null if none. */
+    private String dresscode;
 }

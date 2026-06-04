@@ -24,4 +24,7 @@ public class ScheduleResponseDto {
 
     /** The tag/category required to match wardrobe items. */
     private String targetTag;
+
+    /** Optional dresscode required for this activity. Null if none. */
+    private String dresscode;
 }

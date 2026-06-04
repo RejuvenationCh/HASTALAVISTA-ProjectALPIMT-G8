@@ -117,6 +117,7 @@ public class ScheduleController {
                 .activityName(schedule.getActivityName())
                 .targetToken(schedule.getTargetToken())
                 .targetTag(schedule.getTargetTag())
+                .dresscode(schedule.getDresscode())
                 .build();
     }
 }

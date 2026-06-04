@@ -16,6 +16,13 @@
 @rem SPDX-License-Identifier: Apache-2.0
 @rem
 
+@rem Fix for JDK 21 + Windows: Gradle uses Unix Domain Sockets whose path
+@rem must be short. Setting TEMP before setlocal keeps it in the outer scope
+@rem so it survives endlocal and reaches the JVM's native socket code.
+if not exist "C:\tmp" mkdir "C:\tmp"
+set TEMP=C:\tmp
+set TMP=C:\tmp
+
 @if "%DEBUG%"=="" @echo off
 @rem ##########################################################################
 @rem

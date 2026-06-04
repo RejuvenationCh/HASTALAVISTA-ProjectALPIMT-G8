@@ -69,8 +69,12 @@
      ]
  };
 
+flatpickr("#inputDate", {
+    dateFormat: "d-m-Y"
+});
+
 let currentSelectedDate = null;
- 
+
 function buildCalendar() {
 
     const today = new Date();

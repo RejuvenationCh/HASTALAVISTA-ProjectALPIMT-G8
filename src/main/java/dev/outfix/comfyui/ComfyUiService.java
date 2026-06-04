@@ -24,43 +24,82 @@ public class ComfyUiService {
 
     private final Random random = new Random();
 
-    /**
-     * Main entry point called by the controller.
-     * Loads the CatVTON workflow, injects the two image filenames and clothing type,
-     * submits it to ComfyUI, then polls until the output image is ready.
-     *
-     * clothingType: "TOP", "BOTTOM", or "DRESS"
-     */
+    // -------------------------------------------------------------------------
+    // Single garment
+    // -------------------------------------------------------------------------
+
     public String generateMockup(String faceFilename, String garmentFilename, String clothingType)
             throws IOException, InterruptedException {
 
-        ObjectNode workflow = buildWorkflow(faceFilename, garmentFilename, clothingType);
+        ObjectNode workflow = buildSingleWorkflow(faceFilename, garmentFilename, clothingType);
         String promptId = submitPrompt(workflow);
-        log.info("Submitted to ComfyUI. prompt_id={}", promptId);
-        return pollForOutputImage(promptId);
+        log.info("Single-garment submitted. prompt_id={}", promptId);
+        return pollForOutputImage(promptId, props.getNode().getOutputNodeId());
     }
 
-    // --- Step 1: Build the workflow from the JSON template ---
-
-    private ObjectNode buildWorkflow(String faceFilename, String garmentFilename, String clothingType)
+    private ObjectNode buildSingleWorkflow(String faceFilename, String garmentFilename, String clothingType)
             throws IOException {
 
-        ClassPathResource resource = new ClassPathResource("comfyui/workflow_template.json");
-        ObjectNode workflow = (ObjectNode) objectMapper.readTree(resource.getInputStream());
+        ComfyUiProperties.Node n = props.getNode();
+        ObjectNode workflow = loadTemplate("comfyui/workflow_template.json");
 
-        // Inject person and garment image filenames into their LoadImage nodes
-        setImageFilename(workflow, props.getNode().getFaceInputId(), faceFilename);
-        setImageFilename(workflow, props.getNode().getGarmentInputId(), garmentFilename);
-
-        // Randomize seed on node 305 (CatVTONWrapper) so each render is unique
-        ObjectNode node305 = (ObjectNode) workflow.get("305").get("inputs");
-        node305.put("seed", random.nextLong(1_000_000_000L));
-
-        // Set clothing segmentation flags on node 307 based on clothingType
-        ObjectNode node307 = (ObjectNode) workflow.get("307").get("inputs");
-        applyClothingType(node307, clothingType);
+        setImageFilename(workflow, n.getFaceInputId(),    faceFilename);
+        setImageFilename(workflow, n.getGarmentInputId(), garmentFilename);
+        randomizeSeed(workflow, n.getCatvtonNodeId());
+        applyClothingType(inputs(workflow, n.getSegmentNodeId()), clothingType);
 
         return workflow;
+    }
+
+    // -------------------------------------------------------------------------
+    // Full outfit — 3 sequential CatVTON passes (top → bottom → shoes)
+    // RMBG flags are fixed in the template; Spring Boot only injects filenames + seeds.
+    // -------------------------------------------------------------------------
+
+    public String generateFullOutfit(String faceFilename,
+                                     String topFilename,
+                                     String bottomFilename,
+                                     String shoesFilename)
+            throws IOException, InterruptedException {
+
+        ObjectNode workflow = buildFullOutfitWorkflow(faceFilename, topFilename, bottomFilename, shoesFilename);
+        String promptId = submitPrompt(workflow);
+        log.info("Full-outfit submitted. prompt_id={}", promptId);
+        return pollForOutputImage(promptId, props.getNode().getFullOutfitOutputNodeId());
+    }
+
+    private ObjectNode buildFullOutfitWorkflow(String faceFilename,
+                                               String topFilename,
+                                               String bottomFilename,
+                                               String shoesFilename)
+            throws IOException {
+
+        ComfyUiProperties.Node n = props.getNode();
+        ObjectNode workflow = loadTemplate("comfyui/workflow_full_outfit_template.json");
+
+        // Inject the 4 image filenames
+        setImageFilename(workflow, n.getFaceInputId(),           faceFilename);
+        setImageFilename(workflow, n.getTopGarmentInputId(),     topFilename);
+        setImageFilename(workflow, n.getBottomGarmentInputId(),  bottomFilename);
+        setImageFilename(workflow, n.getShoesGarmentInputId(),   shoesFilename);
+
+        // Randomize seeds on all three CatVTON passes so each run is unique
+        randomizeSeed(workflow, n.getCatvtonNodeId());
+        randomizeSeed(workflow, n.getCatvtonPass2NodeId());
+        randomizeSeed(workflow, n.getCatvtonPass3NodeId());
+
+        return workflow;
+        // Note: RMBG flags (307, 315, 319) are fixed in the template —
+        // 307 targets top, 315 targets bottom, 319 targets shoes.
+    }
+
+    // -------------------------------------------------------------------------
+    // Shared helpers
+    // -------------------------------------------------------------------------
+
+    private ObjectNode loadTemplate(String classpathPath) throws IOException {
+        ClassPathResource resource = new ClassPathResource(classpathPath);
+        return (ObjectNode) objectMapper.readTree(resource.getInputStream());
     }
 
     private void setImageFilename(ObjectNode workflow, String nodeId, String filename) {
@@ -68,36 +107,36 @@ public class ComfyUiService {
         if (node == null) {
             throw new IllegalStateException(
                 "Workflow template missing node id='" + nodeId + "'. " +
-                "Check comfyui.node.face-input-id / garment-input-id in application.properties."
-            );
+                "Check comfyui.node.* in application.properties.");
         }
-        ((ObjectNode) node.get("inputs")).put("image", filename);
+        inputs(workflow, nodeId).put("image", filename);
     }
 
-    /**
-     * Turns on the correct boolean flags in the ClothesSegment node
-     * based on what type of clothing the user selected.
-     */
-    private void applyClothingType(ObjectNode node307inputs, String clothingType) {
-        // Reset all to false first
-        node307inputs.put("Upper-clothes", false);
-        node307inputs.put("Dress", false);
-        node307inputs.put("Pants", false);
-        node307inputs.put("Skirt", false);
-        node307inputs.put("Scarf", false);
+    private void randomizeSeed(ObjectNode workflow, String nodeId) {
+        inputs(workflow, nodeId).put("seed", random.nextLong(1_000_000_000L));
+    }
+
+    private ObjectNode inputs(ObjectNode workflow, String nodeId) {
+        return (ObjectNode) workflow.get(nodeId).get("inputs");
+    }
+
+    private void applyClothingType(ObjectNode segInputs, String clothingType) {
+        segInputs.put("Upper-clothes", false);
+        segInputs.put("Dress",         false);
+        segInputs.put("Pants",         false);
+        segInputs.put("Skirt",         false);
+        segInputs.put("Left-shoe",     false);
+        segInputs.put("Right-shoe",    false);
+        segInputs.put("Scarf",         false);
 
         switch (clothingType.toUpperCase()) {
-            case "TOP"    -> node307inputs.put("Upper-clothes", true);
-            case "BOTTOM" -> {
-                node307inputs.put("Pants", true);
-                node307inputs.put("Skirt", true);
-            }
-            case "DRESS"  -> node307inputs.put("Dress", true);
-            default       -> node307inputs.put("Upper-clothes", true); // fallback
+            case "TOP"    -> segInputs.put("Upper-clothes", true);
+            case "BOTTOM" -> { segInputs.put("Pants", true); segInputs.put("Skirt", true); }
+            case "DRESS"  -> segInputs.put("Dress", true);
+            case "SHOES"  -> { segInputs.put("Left-shoe", true); segInputs.put("Right-shoe", true); }
+            default       -> segInputs.put("Upper-clothes", true);
         }
     }
-
-    // --- Step 2: POST the workflow to ComfyUI ---
 
     private String submitPrompt(ObjectNode workflow) {
         Map<String, Object> payload = Map.of(
@@ -119,9 +158,7 @@ public class ComfyUiService {
         return response.get("prompt_id").asText();
     }
 
-    // --- Step 3: Poll /history until the job is done ---
-
-    private String pollForOutputImage(String promptId) throws InterruptedException {
+    private String pollForOutputImage(String promptId, String outputNodeId) throws InterruptedException {
         int maxAttempts = props.getPolling().getMaxAttempts();
 
         for (int attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -140,7 +177,7 @@ public class ComfyUiService {
 
             JsonNode job = history.get(promptId);
             if (job.path("status").path("completed").asBoolean(false)) {
-                String filename = extractOutputFilename(job);
+                String filename = extractOutputFilename(job, outputNodeId);
                 log.info("Render complete. output={}", filename);
                 return filename;
             }
@@ -153,8 +190,7 @@ public class ComfyUiService {
         return null;
     }
 
-    private String extractOutputFilename(JsonNode job) {
-        String outputNodeId = props.getNode().getOutputNodeId();
+    private String extractOutputFilename(JsonNode job, String outputNodeId) {
         JsonNode images = job.path("outputs").path(outputNodeId).path("images");
 
         if (images.isArray() && !images.isEmpty()) {
@@ -163,8 +199,7 @@ public class ComfyUiService {
 
         throw new IllegalStateException(
             "Render finished but no image found at outputs[" + outputNodeId + "]. " +
-            "Check comfyui.node.output-node-id in application.properties."
-        );
+            "Check comfyui.node.output-node-id in application.properties.");
     }
 
     public String buildViewUrl(String filename) {

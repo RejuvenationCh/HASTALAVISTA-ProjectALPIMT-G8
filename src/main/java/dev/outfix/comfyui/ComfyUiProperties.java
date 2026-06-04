@@ -17,9 +17,20 @@ public class ComfyUiProperties {
     @Getter
     @Setter
     public static class Node {
-        private String faceInputId = "1";
-        private String garmentInputId = "2";
-        private String outputNodeId = "9";
+        // --- Single garment (workflow_template.json) ---
+        private String faceInputId    = "295";
+        private String garmentInputId = "297";   // LoadImage garment in single workflow
+        private String segmentNodeId  = "307";
+        private String catvtonNodeId  = "305";
+        private String outputNodeId   = "163";
+
+        // --- Full outfit (workflow_full_outfit_template.json) ---
+        private String topGarmentInputId    = "310";
+        private String bottomGarmentInputId = "311";
+        private String shoesGarmentInputId  = "312";
+        private String catvtonPass2NodeId   = "316";
+        private String catvtonPass3NodeId   = "318";
+        private String fullOutfitOutputNodeId = "163";
     }
 
     @Getter
@@ -27,5 +38,4 @@ public class ComfyUiProperties {
     public static class Polling {
         private int maxAttempts = 30;
     }
-
 }

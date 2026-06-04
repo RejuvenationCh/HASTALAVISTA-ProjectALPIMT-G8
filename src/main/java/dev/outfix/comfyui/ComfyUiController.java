@@ -25,8 +25,6 @@ public class ComfyUiController {
     /**
      * POST /api/mockup/upload
      * Proxies a multipart image upload to ComfyUI's /upload/image endpoint.
-     * The frontend calls this instead of hitting ComfyUI directly (avoids CORS).
-     * Returns: { "name": "filename.jpg" }
      */
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, String>> upload(@RequestParam("image") MultipartFile file) {
@@ -62,10 +60,8 @@ public class ComfyUiController {
 
     /**
      * POST /api/mockup/test
-     * Accepts filenames already uploaded to ComfyUI, runs the CatVTON pipeline,
-     * and returns the output image URL.
-     *
-     * Body: { "faceFilename": "...", "garmentFilename": "...", "clothingType": "TOP|BOTTOM|DRESS" }
+     * Single garment try-on.
+     * Body: { "faceFilename", "garmentFilename", "clothingType": TOP|BOTTOM|DRESS }
      */
     @PostMapping("/test")
     public ResponseEntity<GenerateMockupResponse> test(@RequestBody Map<String, String> body) {
@@ -80,13 +76,42 @@ public class ComfyUiController {
 
         try {
             String outputFilename = comfyUiService.generateMockup(faceFilename, garmentFilename, clothingType);
-
             if (outputFilename == null) return ResponseEntity.ok(GenerateMockupResponse.timeout());
-
             return ResponseEntity.ok(GenerateMockupResponse.success(comfyUiService.buildViewUrl(outputFilename)));
-
         } catch (Exception e) {
-            log.error("Test generation failed", e);
+            log.error("Single-garment generation failed", e);
+            return ResponseEntity.internalServerError()
+                .body(GenerateMockupResponse.error("Generation failed: " + e.getMessage()));
+        }
+    }
+
+    /**
+     * POST /api/mockup/full
+     * Full outfit try-on (top + bottom + shoes, 3 sequential CatVTON passes).
+     * Body: { "faceFilename", "topFilename", "bottomFilename", "shoesFilename" }
+     */
+    @PostMapping("/full")
+    public ResponseEntity<GenerateMockupResponse> full(@RequestBody Map<String, String> body) {
+        String faceFilename   = body.get("faceFilename");
+        String topFilename    = body.get("topFilename");
+        String bottomFilename = body.get("bottomFilename");
+        String shoesFilename  = body.get("shoesFilename");
+
+        if (faceFilename == null || topFilename == null || bottomFilename == null || shoesFilename == null) {
+            return ResponseEntity.badRequest()
+                .body(GenerateMockupResponse.error("faceFilename, topFilename, bottomFilename, and shoesFilename are all required."));
+        }
+
+        try {
+            String outputFilename = comfyUiService.generateFullOutfit(
+                faceFilename, topFilename, bottomFilename, shoesFilename);
+            if (outputFilename == null) return ResponseEntity.ok(GenerateMockupResponse.timeout());
+            return ResponseEntity.ok(GenerateMockupResponse.success(comfyUiService.buildViewUrl(outputFilename)));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.internalServerError()
+                .body(GenerateMockupResponse.error(e.getMessage()));
+        } catch (Exception e) {
+            log.error("Full-outfit generation failed", e);
             return ResponseEntity.internalServerError()
                 .body(GenerateMockupResponse.error("Generation failed: " + e.getMessage()));
         }

@@ -1,0 +1,650 @@
+/* Base Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'SF Pro', sans-serif;
+}
+
+body {
+    background-color: #ffffff;
+    color: #000;
+    overflow-x: hidden;
+}
+
+::-webkit-scrollbar {
+        display: none;
+    }
+/* =========================================
+   NAVBAR STYLES
+   ========================================= */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background-color: #ffffff;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 20px 50px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.logo img {
+    height: 100px;
+    width: auto;
+    vertical-align: middle;
+}
+
+.nav-links {
+    display: flex;
+    gap: 40px;
+    justify-content: center;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 10px 0;
+    transition: color 0.3s ease;
+}
+
+.nav-links a:hover {
+    color: #666;
+}
+
+.nav-links a.active {
+    color: #000;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 25px;
+}
+
+.icon-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #000;
+}
+
+/* =========================================
+   SLIDER SECTION (HOME)
+   ========================================= */
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 101px);
+    overflow: hidden;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.slides-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #d3d3d3;
+    font-size: 50px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+    color: #888;
+}
+
+.prev-btn { left: 40px; }
+.next-btn { right: 40px; }
+
+/* =========================================
+   ABOUT SECTION (HOME)
+   ========================================= */
+.about-section {
+    position: relative;
+    overflow: hidden;
+    padding: 120px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 500px;
+}
+
+.about-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 90%;
+    z-index: 1;
+    object-fit: contain;
+}
+
+.left-img { left: -5%; }
+.right-img { right: -5%; }
+
+.about-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-content h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+}
+
+.about-logo-inline {
+    height: 54px;
+    width: auto;
+    margin: 0 10px;
+    object-fit: contain;
+}
+
+.about-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #222;
+    margin-bottom: 50px;
+}
+
+.vision-text {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* =========================================
+   FOOTER SECTION
+   ========================================= */
+.site-footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.school-logo {
+    height: 200px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.footer-text p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #888888;
+    margin-bottom: 12px;
+}
+
+/* =========================================
+   AUTHENTICATION OVERLAYS (MODAL)
+   ========================================= */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 12px;
+    width: 400px;
+    max-width: 90%;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.modal-content h2 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.modal-content p {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 20px;
+    line-height: 1.4;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #999;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px 12px 12px 40px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+}
+
+.modal-btn {
+    width: 100%;
+    padding: 12px;
+    background-color: #b3b3b3;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.modal-btn:hover {
+    background-color: #999;
+}
+
+.toggle-auth {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 12px;
+}
+
+.toggle-auth a {
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+}
+
+/* =========================================
+   GENERATE PAGE STYLES
+   ========================================= */
+.generate-section {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 101px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+}
+
+.generate-banner {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.create-now-btn {
+    position: absolute;
+    bottom: 25%;
+    right: 15%;
+    background-color: #222;
+    color: #fff;
+    padding: 15px 60px;
+    border: none;
+    font-weight: bold;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.3s;
+}
+
+.create-now-btn:hover {
+    background-color: #000;
+}
+
+/* =========================================
+   ACCOUNT PAGE STYLES
+   ========================================= */
+.account-body {
+    background-color: #f5f5f5;
+}
+
+.account-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
+}
+
+.account-container h1 {
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.account-card {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 25px;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+}
+
+.account-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.account-card-text h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.account-card-text p {
+    font-size: 13px;
+    color: #666;
+}
+
+.account-actions {
+    display: flex;
+    gap: 15px;
+}
+
+.btn-outline {
+    border: 1px solid #000;
+    background: transparent;
+    padding: 8px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-solid {
+    background-color: #000;
+    color: #fff;
+    padding: 8px 25px;
+    border-radius: 4px;
+    font-weight: bold;
+    border: 1px solid #000;
+    cursor: pointer;
+}
+
+.mix-empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: #999;
+}
+
+.mix-empty-state i {
+    font-size: 40px;
+    margin-bottom: 10px;
+    color: #ccc;
+}
+
+/* =========================================
+   NOTIFICATION PANEL
+   ========================================= */
+.notif-bell-wrap {
+    position: relative;
+}
+
+.notif-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #000;
+    color: #fff;
+    font-size: 9px;
+    font-weight: 800;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.notif-panel {
+    position: absolute;
+    top: calc(100% + 14px);
+    right: 0;
+    width: 340px;
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    z-index: 1500;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(-8px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.notif-panel.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+}
+
+.notif-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.notif-panel-header h3 {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.notif-mark-all-btn {
+    background: none;
+    border: none;
+    font-size: 11px;
+    color: #888;
+    cursor: pointer;
+    font-weight: 600;
+    padding: 0;
+}
+
+.notif-mark-all-btn:hover {
+    color: #000;
+}
+
+.notif-list {
+    max-height: 360px;
+    overflow-y: auto;
+}
+
+.notif-item {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 14px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background 0.15s;
+    cursor: default;
+}
+
+.notif-item:last-child {
+    border-bottom: none;
+}
+
+.notif-item:hover {
+    background: #fafafa;
+}
+
+.notif-item.unread {
+    background: #f8f8f8;
+}
+
+.notif-item.unread:hover {
+    background: #f2f2f2;
+}
+
+.notif-icon-wrap {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    background: #000;
+    color: #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    margin-top: 2px;
+}
+
+.notif-icon-wrap.schedule {
+    background: #444;
+}
+
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+
+.notif-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 3px;
+}
+
+.notif-message {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.4;
+    margin-bottom: 4px;
+}
+
+.notif-time {
+    font-size: 10px;
+    color: #aaa;
+    font-weight: 600;
+}
+
+.notif-unread-dot {
+    width: 7px;
+    height: 7px;
+    background: #000;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: 6px;
+}
+
+.notif-empty {
+    padding: 40px 20px;
+    text-align: center;
+    color: #aaa;
+    font-size: 13px;
+}
+
+.notif-empty i {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+/* =========================================
+   SHARED ACTION BUTTONS
+   ========================================= */
+.auth-primary-btn {
+    background-color: #000000;
+    color: #ffffff;
+    border: 1px solid #000000;
+    padding: 14px 35px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-primary-btn:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+.auth-secondary-btn {
+    background-color: #ffffff;
+    color: #000000;
+    border: 1px solid #e5e5e5;
+    padding: 14px 35px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.auth-secondary-btn:hover {
+    border-color: #000000;
+}

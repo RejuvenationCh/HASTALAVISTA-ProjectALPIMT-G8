@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfix</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+        </div>
+        <nav class="nav-links">
+            <a href="/wardrobe">My Wardrobe</a>
+            <a href="/collection">Collection</a>
+            <a href="/generate">Generate</a>
+            <a href="/schedule">Schedule</a>
+        </nav>
+        <div class="nav-actions">
+            <div class="notif-bell-wrap">
+                <button class="icon-btn" id="notif-bell-btn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <span class="notif-badge" id="notif-badge">2</span>
+                <div class="notif-panel" id="notif-panel"></div>
+            </div>
+            <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+
+    <main class="slider-container">
+        <div class="slides-wrapper">
+            <div class="slide">
+                <img src="/image/OUTFIX (1).jpg" alt="First Slide" class="full-slide-img">
+            </div>
+            <div class="slide">
+                <img src="/image/OUTFIX (2).jpg" alt="Second Slide" class="full-slide-img">
+            </div>
+            <div class="slide">
+                <img src="/image/OUTFIX (3).jpg" alt="Last Slide" class="full-slide-img">
+            </div>
+        </div>
+        <button class="slider-btn prev-btn">&#10094;</button>
+        <button class="slider-btn next-btn">&#10095;</button>
+    </main>
+
+    <section class="about-section">
+        <img src="/image/IMAGE (LEFT).jpeg" alt="Grey Dress" class="about-img left-img">
+        <div class="about-content">
+            <h2>ABOUT <img src="/image/LOGO.png" alt="O" class="about-logo-inline">OUTFIX.</h2>
+            <p><strong>Outfix.</strong> was created to help people spend less time overthinking what to wear every day.<br>
+            By combining wardrobe management, daily agenda planning, and personalized outfit <br>
+            recommendations, it helps users express their style <br>
+            more efficiently and confidently.</p>
+            <h3 class="vision-text">OUR VISION TO SIMPLIFY DAILY OUTFIT DECISION</h3>
+        </div>
+        <img src="/image/IMAGE (RIGHT).jpeg" alt="Right Clothing Asset" class="about-img right-img">
+    </section>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <img src="/image/CIPUTRA.png" alt="Campus Logo" class="school-logo">
+            <div class="footer-text">
+                <p>This website is a project made for Web Programming, Object Oriented Programming<br>
+                and Data Structure Class at Universitas Ciputra Surabaya, Kampus Kota<br>
+                Makassar. It is not a real commercial website.</p>
+                <p>&copy; 2026 Outfix. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="auth-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+
+            <div id="login-form-container">
+                <h2>Login</h2>
+                <p id="login-error" style="color:#cc0000;display:none;font-size:13px;margin-bottom:10px;"></p>
+                <div class="input-group">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="login-email" placeholder="Email">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="Password">
+                </div>
+                <button class="modal-btn" id="login-submit-btn">Login</button>
+                <div class="toggle-auth">
+                    Don't have an account? <a id="go-to-signup">Signup here</a>
+                </div>
+            </div>
+
+            <div id="signup-form-container" style="display: none;">
+                <h2>Register</h2>
+                <p id="signup-error" style="color:#cc0000;display:none;font-size:13px;margin-bottom:10px;"></p>
+                <div class="input-group">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="signup-name" placeholder="Your Full Name">
+                </div>
+                <div class="input-group">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="text" id="signup-email" placeholder="Email">
+                </div>
+                <div class="input-group">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="signup-password" placeholder="Password">
+                </div>
+                <button class="modal-btn" id="signup-submit-btn">Create Account</button>
+                <div class="toggle-auth">
+                    Already have an account? <a id="go-to-login">Login here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.state.js"></script>
+    <script src="/js/api.service.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfix - My Wardrobe</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/wardrobe.css">
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="logo">
+            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+        </div>
+        <nav class="nav-links">
+            <a href="/wardrobe" class="active">My Wardrobe</a>
+            <a href="/collection">Collection</a>
+            <a href="/generate">Generate</a>
+            <a href="/schedule">Schedule</a>
+        </nav>
+        <div class="nav-actions">
+            <div class="notif-bell-wrap">
+                <button class="icon-btn" id="notif-bell-btn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <span class="notif-badge" id="notif-badge">2</span>
+                <div class="notif-panel" id="notif-panel"></div>
+            </div>
+            <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+
+    <div class="wardrobe-layout">
+
+        <!-- ── LEFT SIDEBAR ── -->
+        <aside class="wardrobe-sidebar">
+
+            <div class="sidebar-search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="sidebar-search-input" placeholder="Search items...">
+            </div>
+
+            <div>
+                <p class="sidebar-section-title">Categories</p>
+                <div class="filter-checkbox-list" id="category-filter-list">
+                    <!-- Populated dynamically from TagService.getTags() -->
+                    <label>
+                        <input type="checkbox" value="all" checked> All Items
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <p class="sidebar-section-title">Conditions</p>
+                <div class="filter-checkbox-list" id="condition-filter-list">
+                    <!-- Populated dynamically from TagService.getTags() -->
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- ── MAIN CONTENT ── -->
+        <main class="wardrobe-main">
+
+            <div class="wardrobe-main-header">
+                <div>
+                    <h1>MY WARDROBE</h1>
+                    <p>Manage, categorize, and organize your apparel catalog.</p>
+                </div>
+                <button id="open-add-modal-btn" class="add-item-btn" aria-label="Add new item" title="Add Item">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+            </div>
+
+            <div id="wardrobe-grid" class="wardrobe-grid-v2">
+                <!-- IDLE / PENDING: skeleton cards injected by JS -->
+                <!-- SUCCESS: clothing cards injected by JS -->
+                <!-- ERROR: error banner injected by JS -->
+            </div>
+
+        </main>
+    </div>
+
+    <!-- ══════════════════════════════════════════════════════
+         ADD ITEM MODAL
+    ══════════════════════════════════════════════════════ -->
+    <div id="add-item-modal" class="add-modal-overlay" role="dialog" aria-modal="true" aria-label="Add new apparel">
+
+        <div class="add-modal-card">
+            <button id="close-add-modal-btn" class="add-modal-close" aria-label="Close">&times;</button>
+
+            <h2 class="add-modal-title">ADD NEW APPAREL</h2>
+            <p class="add-modal-subtitle">Upload an image and define attributes for your clothing item.</p>
+
+            <form id="add-clothing-form" autocomplete="off" novalidate>
+
+                <!-- Image Upload -->
+                <div class="add-modal-dropzone" id="dropzone-area" role="button" tabindex="0" aria-label="Click to upload clothing image">
+                    <input type="file" id="clothing-file-input" accept="image/*" hidden>
+                    <i class="fa-regular fa-image"></i>
+                    <p>Click to browse or drag & drop</p>
+                    <span>Supports JPG, PNG, JPEG</span>
+                    <img id="dropzone-preview" class="add-modal-dropzone-preview" src="" alt="Clothing preview">
+                </div>
+
+                <!-- Form fields: 2-column grid -->
+                <div class="add-modal-form-grid">
+
+                    <!-- Left column -->
+                    <div>
+                        <div class="add-modal-field" style="margin-bottom: 20px;">
+                            <label for="item-name">Item Name</label>
+                            <input type="text" id="item-name" placeholder="e.g. Cropped Leather Bomber Jacket" required>
+                        </div>
+
+                        <div class="add-modal-field">
+                            <label>Category</label>
+                            <div class="modal-checkbox-grid" id="modal-category-list">
+                                <!-- Populated from TagService.getTags() -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right column -->
+                    <div>
+                        <div class="add-modal-field" style="margin-bottom: 20px;">
+                            <label for="item-formality">Formality Token (1 = Casual · 5 = Formal)</label>
+                            <input type="number" id="item-formality" min="1" max="5" placeholder="e.g. 3" required>
+                        </div>
+
+                        <div class="add-modal-field">
+                            <label>Condition</label>
+                            <div class="modal-checkbox-grid" id="modal-condition-list">
+                                <!-- Populated from TagService.getTags() -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="add-modal-footer">
+                    <button type="button" id="cancel-modal-btn" class="auth-secondary-btn">CANCEL</button>
+                    <button type="submit" id="submit-add-btn" class="auth-primary-btn">ADD TO WARDROBE</button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+    <!-- Script load order matters: state → service → page logic -->
+    <script src="/js/app.state.js"></script>
+    <script src="/js/api.service.js"></script>
+    <script src="/js/wardrobe.js"></script>
+</body>
+</html>

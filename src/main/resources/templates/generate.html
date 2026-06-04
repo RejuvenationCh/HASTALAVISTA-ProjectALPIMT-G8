@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Outfix - Generate</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+        </div>
+        <nav class="nav-links">
+            <a href="/wardrobe">My Wardrobe</a>
+            <a href="/collection">Collection</a>
+            <a href="/generate" class="active">Generate</a>
+            <a href="/schedule">Schedule</a>
+        </nav>
+        <div class="nav-actions">
+            <div class="notif-bell-wrap">
+                <button class="icon-btn" id="notif-bell-btn" aria-label="Notifications">
+                    <i class="fa-regular fa-bell"></i>
+                </button>
+                <span class="notif-badge" id="notif-badge">2</span>
+                <div class="notif-panel" id="notif-panel"></div>
+            </div>
+            <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
+        </div>
+    </header>
+
+    <main class="generate-section">
+        <img src="/image/GENERATE YOURS.jpg" alt="Generate Yours" class="generate-banner">
+        <button class="create-now-btn">Create Now</button>
+    </main>
+
+    <script src="/js/app.state.js"></script>
+    <script src="/js/api.service.js"></script>
+    <script src="/js/script.js"></script>
+</body>
+</html>

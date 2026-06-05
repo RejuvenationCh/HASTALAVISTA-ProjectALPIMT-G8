@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import dev.outfix.recommendation.dto.OutfitRecommendationResponseDto;
 import dev.outfix.recommendation.dto.RecommendationResponseDto;
 import dev.outfix.recommendation.service.RecommendationService;
 import dev.outfix.user.entity.User;
@@ -36,5 +37,19 @@ public class RecommendationController {
         RecommendationResponseDto result =
                 recommendationService.recommend(scheduleId, currentUser);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * GET /api/recommendation/{scheduleId}/outfit
+     * Returns a single top + pants outfit matched to the schedule's formality token.
+     */
+    @GetMapping("/{scheduleId}/outfit")
+    public ResponseEntity<OutfitRecommendationResponseDto> recommendOutfit(
+            @PathVariable Long scheduleId,
+            Authentication auth) {
+
+        User currentUser = userService.getByEmail(auth.getName());
+        return ResponseEntity.ok(
+                recommendationService.recommendOutfit(scheduleId, currentUser));
     }
 }

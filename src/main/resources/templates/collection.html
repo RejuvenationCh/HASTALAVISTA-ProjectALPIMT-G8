@@ -6,6 +6,20 @@
     <title>Outfix - My Collection</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <style>
+        .coll-wrap { padding: 32px 48px; }
+        .coll-tabs { display:flex; gap:10px; margin:18px 0 24px; }
+        .coll-tab { border:1px solid #ddd; background:#fff; border-radius:999px; padding:8px 18px; cursor:pointer; font-weight:600; font-size:13px; }
+        .coll-tab.active { background:#111; color:#fff; border-color:#111; }
+        .coll-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:20px; }
+        .coll-card { border:1px solid #eee; border-radius:12px; overflow:hidden; background:#fff; position:relative; }
+        .coll-card img { width:100%; height:230px; object-fit:cover; background:#f3f3f3; }
+        .coll-card .coll-body { padding:10px 12px; }
+        .coll-card .coll-cat { font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#999; }
+        .coll-fav { position:absolute; top:10px; right:10px; background:rgba(255,255,255,.9); border:none; border-radius:50%; width:32px; height:32px; cursor:pointer; color:#e63946; font-size:15px; }
+        .coll-empty { text-align:center; color:#888; padding:60px 0; }
+        .badge-fashion { position:absolute; top:10px; left:10px; background:#111; color:#fff; font-size:10px; padding:3px 8px; border-radius:999px; letter-spacing:.05em; }
+    </style>
 </head>
 <body>
     <header class="navbar">
@@ -13,7 +27,8 @@
             <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
         <nav class="nav-links">
-            <a href="/wardrobe">My Wardrobe</a>
+            <a href="/clothing">Clothing</a>
+            <a href="/wardrobe">Wardrobe</a>
             <a href="/collection" class="active">Collection</a>
             <a href="/generate">Generate</a>
             <a href="/schedule">Schedule</a>
@@ -30,19 +45,27 @@
         </div>
     </header>
 
-    <main class="account-container">
+    <main class="coll-wrap">
         <h1>My Collection</h1>
-        <div class="account-card">
-            <div class="mix-empty-state">
-                <i class="fa-solid fa-box-archive"></i>
-                <p><strong>No Collection found</strong></p>
-                <p>Save your favorite outfits to see them listed here.</p>
-            </div>
+        <p style="color:#777; margin-top:4px;">Your favorited clothing and outfits.</p>
+
+        <div class="coll-tabs">
+            <button class="coll-tab active" data-filter="all">All</button>
+            <button class="coll-tab" data-filter="clothing">Clothing</button>
+            <button class="coll-tab" data-filter="fashion">Fashion</button>
+        </div>
+
+        <div class="coll-grid" id="coll-grid"></div>
+
+        <div class="coll-empty" id="coll-empty" style="display:none;">
+            <i class="fa-regular fa-heart" style="font-size:32px;"></i>
+            <p>Nothing favorited yet. Tap the ♥ on a clothing item or an outfit to save it here.</p>
         </div>
     </main>
 
     <script th:src="@{/js/app.state.js}"></script>
     <script th:src="@{/js/api.service.js}"></script>
     <script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/js/collection.js}"></script>
 </body>
 </html>

@@ -48,30 +48,34 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Strip the "Bearer " prefix to get the raw token string
+        // Strip the "Bearer " prefix to get the raw token string.
+        // A malformed/expired token (or the literal "Bearer null" the frontend sends
+        // when logged out) must not crash the chain — just continue unauthenticated.
         String jwtToken = authorizationHeader.substring(7);
-        String userEmail = jwtService.extractEmail(jwtToken);
+        try {
+            String userEmail = jwtService.extractEmail(jwtToken);
 
-        // Only proceed if we got an email and the user is not already authenticated
-        boolean userIsNotYetAuthenticated =
-                userEmail != null
-                && SecurityContextHolder.getContext().getAuthentication() == null;
+            boolean userIsNotYetAuthenticated =
+                    userEmail != null
+                    && SecurityContextHolder.getContext().getAuthentication() == null;
 
-        if (userIsNotYetAuthenticated) {
-            UserDetails userDetails =
-                    userDetailsService.loadUserByUsername(userEmail);
+            if (userIsNotYetAuthenticated) {
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtService.isTokenValid(jwtToken, userDetails)) {
-                // Tell Spring Security this user is authenticated
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails, null,
-                                userDetails.getAuthorities());
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource()
-                                .buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                if (jwtService.isTokenValid(jwtToken, userDetails)) {
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails, null,
+                                    userDetails.getAuthorities());
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (Exception ignored) {
+            // Invalid token — proceed without authentication.
         }
 
         filterChain.doFilter(request, response);

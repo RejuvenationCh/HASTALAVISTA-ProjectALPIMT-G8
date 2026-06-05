@@ -73,6 +73,12 @@ public class ClothingService {
         clothingRepository.delete(getById(id, requestingUser));
     }
 
+    public Clothing toggleFavorite(Long id, User requestingUser) {
+        Clothing item = getById(id, requestingUser);
+        item.setFavorite(!item.isFavorite());
+        return clothingRepository.save(item);
+    }
+
     private String savePhoto(Long userId, MultipartFile file) throws IOException {
         Path folder = Paths.get(uploadDirectory, "clothing", userId.toString());
         Files.createDirectories(folder);

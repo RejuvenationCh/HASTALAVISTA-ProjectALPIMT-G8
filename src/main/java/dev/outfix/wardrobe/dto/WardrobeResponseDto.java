@@ -26,5 +26,6 @@ public class WardrobeResponseDto {
     private String mockupPngUrl;
 
     private WardrobeStatus status;
+    private boolean favorite;
     private LocalDateTime createdAt;
 }

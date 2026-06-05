@@ -115,6 +115,7 @@ public class ScheduleController {
         return ScheduleResponseDto.builder()
                 .id(schedule.getId())
                 .activityName(schedule.getActivityName())
+                .eventDate(schedule.getEventDate())
                 .targetToken(schedule.getTargetToken())
                 .targetTag(schedule.getTargetTag())
                 .dresscode(schedule.getDresscode())

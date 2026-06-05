@@ -1,6 +1,6 @@
 /**
- * wardrobe.js — page controller for wardrobe.html
- * Reads/writes AppState. All data calls go through api.service.js.
+ * clothing.js — page controller for clothing.html (individual garments).
+ * All data calls go through ClothingService / TagService in api.service.js.
  */
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -21,15 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const modalCategoryList = document.getElementById('modal-category-list');
     const modalConditionList= document.getElementById('modal-condition-list');
 
-    // ── Local state ───────────────────────────────────────────────────────────
     let uploadedImageSrc = '';
 
-    // ── Bootstrap: load tags then load wardrobe items ─────────────────────────
     initPage();
 
     async function initPage() {
         await loadTags();
-        await loadWardrobeItems();
+        await loadItems();
     }
 
     // ── TAG LOADING ───────────────────────────────────────────────────────────
@@ -49,55 +47,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderSidebarFilters() {
-        // Categories — prepend "All Items" then each tag
         categoryList.innerHTML = `
             <label>
                 <input type="checkbox" name="sidebar-category" value="all" checked> All Items
-            </label>
-        `;
+            </label>`;
         AppState.tags.categories.forEach(cat => {
             categoryList.insertAdjacentHTML('beforeend', `
                 <label>
                     <input type="checkbox" name="sidebar-category" value="${cat}"> ${cat}
-                </label>
-            `);
+                </label>`);
         });
 
-        // Conditions
         conditionList.innerHTML = '';
         AppState.tags.conditions.forEach(cond => {
             conditionList.insertAdjacentHTML('beforeend', `
                 <label>
                     <input type="checkbox" name="sidebar-condition" value="${cond}"> ${cond}
-                </label>
-            `);
+                </label>`);
         });
 
         attachFilterListeners();
     }
 
     function renderModalCheckboxes() {
-        // Category checkboxes in add modal (single-select via radio-like behaviour)
         modalCategoryList.innerHTML = '';
         AppState.tags.categories.forEach(cat => {
             modalCategoryList.insertAdjacentHTML('beforeend', `
                 <label>
                     <input type="checkbox" name="modal-category" value="${cat}"> ${cat}
-                </label>
-            `);
+                </label>`);
         });
 
-        // Condition checkboxes in add modal (single-select)
         modalConditionList.innerHTML = '';
         AppState.tags.conditions.forEach(cond => {
             modalConditionList.insertAdjacentHTML('beforeend', `
                 <label>
                     <input type="checkbox" name="modal-condition" value="${cond}"> ${cond}
-                </label>
-            `);
+                </label>`);
         });
 
-        // Enforce single-select behaviour within each group
         enforceSingleSelect(modalCategoryList, 'modal-category');
         enforceSingleSelect(modalConditionList, 'modal-condition');
     }
@@ -142,24 +130,21 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', () => renderGrid());
     }
 
-    // ── WARDROBE ITEM LOADING ─────────────────────────────────────────────────
-    async function loadWardrobeItems() {
+    // ── ITEM LOADING ──────────────────────────────────────────────────────────
+    async function loadItems() {
         AppState.wardrobe.status = 'PENDING';
-        renderGrid(); // shows skeletons
-
+        renderGrid();
         try {
-            const items = await WardrobeService.getItems();
-            AppState.wardrobe.items = items;
+            AppState.wardrobe.items = await ClothingService.getItems();
             AppState.wardrobe.status = 'SUCCESS';
         } catch (err) {
             AppState.wardrobe.status = 'ERROR';
             AppState.wardrobe.error = err.message;
         }
-
         renderGrid();
     }
 
-    // ── GRID RENDERING ENGINE ─────────────────────────────────────────────────
+    // ── GRID RENDERING ────────────────────────────────────────────────────────
     function renderGrid() {
         grid.innerHTML = '';
 
@@ -175,21 +160,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if (AppState.wardrobe.status === 'ERROR') {
             grid.innerHTML = `
                 <div class="wardrobe-error-state">
-                    <span><i class="fa-solid fa-circle-exclamation"></i>&nbsp; ${AppState.wardrobe.error || 'Failed to load wardrobe.'}</span>
+                    <span><i class="fa-solid fa-circle-exclamation"></i>&nbsp; ${AppState.wardrobe.error || 'Failed to load clothing.'}</span>
                     <button class="retry-btn" id="retry-load-btn">RETRY</button>
                 </div>`;
-            document.getElementById('retry-load-btn').addEventListener('click', loadWardrobeItems);
+            document.getElementById('retry-load-btn').addEventListener('click', loadItems);
             return;
         }
 
-        const query    = searchInput.value.trim().toLowerCase();
+        const query      = searchInput.value.trim().toLowerCase();
         const catFilter  = AppState.wardrobe.activeCategory;
         const condFilter = AppState.wardrobe.activeCondition;
 
         const filtered = AppState.wardrobe.items.filter(item => {
-            const matchCat  = catFilter  === 'all' || item.category  === catFilter;
+            const matchCat  = catFilter  === 'all' || item.tags.includes(catFilter);
             const matchCond = condFilter === 'all' || item.condition === condFilter;
-            const matchQ    = !query || item.name.toLowerCase().includes(query) || item.category.toLowerCase().includes(query);
+            const matchQ    = !query || item.name.toLowerCase().includes(query);
             return matchCat && matchCond && matchQ;
         });
 
@@ -209,37 +194,53 @@ document.addEventListener('DOMContentLoaded', () => {
             card.dataset.id = item.id;
             card.innerHTML = `
                 <div class="card-img-wrap">
+                    <button class="card-fav-btn ${item.favorite ? 'active' : ''}" data-id="${item.id}" title="Favorite"
+                            style="position:absolute;top:8px;left:8px;border:none;background:rgba(255,255,255,.9);border-radius:50%;width:30px;height:30px;cursor:pointer;color:${item.favorite ? '#e63946' : '#bbb'};">
+                        <i class="fa-solid fa-heart"></i>
+                    </button>
                     <button class="card-delete-btn" data-id="${item.id}" title="Delete item">
                         <i class="fa-solid fa-trash-can"></i>
                     </button>
                     ${item.imageSrc
                         ? `<img src="${item.imageSrc}" alt="${item.name}">`
-                        : `<div class="card-img-placeholder"><i class="fa-regular fa-image"></i></div>`
-                    }
+                        : `<div class="card-img-placeholder"><i class="fa-regular fa-image"></i></div>`}
                 </div>
                 <div class="card-body">
                     <span class="card-category-tag">${item.tags.join(' · ')}</span>
                     <h3 class="card-name">${item.name}</h3>
                     <div class="card-meta-row">
-                        <span class="card-condition">${item.condition}</span>
                         <span class="card-formality-badge">F${item.tokenFormalitas}</span>
                     </div>
                 </div>`;
             grid.appendChild(card);
         });
 
-        // Delete button delegation
         grid.querySelectorAll('.card-delete-btn').forEach(btn => {
             btn.addEventListener('click', () => handleDelete(btn.dataset.id));
         });
+        grid.querySelectorAll('.card-fav-btn').forEach(btn => {
+            btn.addEventListener('click', () => handleFavorite(btn.dataset.id));
+        });
+    }
+
+    // ── FAVORITE ──────────────────────────────────────────────────────────────
+    async function handleFavorite(id) {
+        try {
+            const updated = await ClothingService.toggleFavorite(id);
+            const item = AppState.wardrobe.items.find(i => String(i.id) === String(id));
+            if (item) item.favorite = updated.favorite;
+            renderGrid();
+        } catch (err) {
+            alert('Could not update favorite: ' + err.message);
+        }
     }
 
     // ── DELETE ────────────────────────────────────────────────────────────────
     async function handleDelete(id) {
-        if (!confirm('Remove this item from your wardrobe?')) return;
+        if (!confirm('Remove this item from your clothing?')) return;
         try {
-            await WardrobeService.deleteItem(id);
-            AppState.wardrobe.items = AppState.wardrobe.items.filter(i => i.id !== id);
+            await ClothingService.deleteItem(id);
+            AppState.wardrobe.items = AppState.wardrobe.items.filter(i => String(i.id) !== String(id));
             renderGrid();
         } catch (err) {
             alert('Could not delete item: ' + err.message);
@@ -275,7 +276,6 @@ document.addEventListener('DOMContentLoaded', () => {
         dropzone.querySelector('span').style.display = 'none';
     });
 
-    // Drag-and-drop support
     dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.style.background = '#f0f0f0'; });
     dropzone.addEventListener('dragleave', () => { dropzone.style.background = ''; });
     dropzone.addEventListener('drop', (e) => {
@@ -299,20 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ── SUBMIT STATE HELPERS ──────────────────────────────────────────────────
-    function setSubmitPending() {
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<span class="btn-spinner"></span> SAVING...';
-    }
-
-    function setSubmitIdle() {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'ADD TO WARDROBE';
-    }
-
-    function setSubmitError() {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = 'TRY AGAIN';
-    }
+    function setSubmitPending() { submitBtn.disabled = true;  submitBtn.innerHTML = '<span class="btn-spinner"></span> SAVING...'; }
+    function setSubmitIdle()    { submitBtn.disabled = false; submitBtn.innerHTML = 'ADD TO CLOTHING'; }
+    function setSubmitError()   { submitBtn.disabled = false; submitBtn.innerHTML = 'TRY AGAIN'; }
 
     // ── FORM SUBMIT ───────────────────────────────────────────────────────────
     addForm.addEventListener('submit', async (e) => {
@@ -321,29 +310,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const name       = document.getElementById('item-name').value.trim();
         const formality  = parseInt(document.getElementById('item-formality').value, 10);
         const categoryEl = modalCategoryList.querySelector('input[name="modal-category"]:checked');
-        const conditionEl= modalConditionList.querySelector('input[name="modal-condition"]:checked');
 
         if (!name) { alert('Please enter an item name.'); return; }
         if (!categoryEl) { alert('Please select a category.'); return; }
-        if (!conditionEl) { alert('Please select a condition.'); return; }
         if (!formality || formality < 1 || formality > 5) { alert('Please enter a formality token between 1 and 5.'); return; }
 
-        const category  = categoryEl.value;
-        const condition = conditionEl.value;
-
+        const category = categoryEl.value;
         setSubmitPending();
 
         try {
-            const newItem = await WardrobeService.addItem({
-                name,
-                category,
-                condition,
+            const newItem = await ClothingService.addItem({
                 tokenFormalitas: formality,
                 tags: [category],
-                imageSrc: uploadedImageSrc,
                 file: fileInput.files[0] || null
             });
-
             AppState.wardrobe.items.unshift(newItem);
             renderGrid();
             closeModal();

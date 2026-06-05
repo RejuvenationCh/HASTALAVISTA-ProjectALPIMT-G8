@@ -72,6 +72,13 @@ public class ComfyUiProperties {
         /** Node ID of the third CatVTON pass (shoes). */
         private String catvtonPass3NodeId = "318";
 
+        /**
+         * Node ID of the post-processing node that normally consumes the shoes pass (318).
+         * For the top+bottom-only generation, its "image" input is rewired to read from
+         * the 2nd CatVTON pass (catvtonPass2NodeId) so the shoes pass is bypassed entirely.
+         */
+        private String shoesPassConsumerId = "299";
+
         /** Node ID of the final output node in the full outfit workflow. */
         private String fullOutfitOutputNodeId = "163";
 

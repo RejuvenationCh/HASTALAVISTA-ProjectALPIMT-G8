@@ -32,16 +32,19 @@ public class WardrobeMockupGenerator {
             String faceComfyName   = upload(owner.getFaceModelUrl());
             String topComfyName    = upload(wardrobe.getTopClothing().getClothingImageUrl());
             String bottomComfyName = upload(wardrobe.getBottomClothing().getClothingImageUrl());
-            String shoesComfyName  = upload(wardrobe.getShoesClothing().getClothingImageUrl());
 
-            String[] result = comfyUiService.generateFullOutfit(
-                    faceComfyName, topComfyName, bottomComfyName, shoesComfyName);
+            // Top + pants only — the shoes pass is bypassed inside generateTopBottom.
+            String jpgFilename = comfyUiService.generateTopBottom(
+                    faceComfyName, topComfyName, bottomComfyName);
 
-            wardrobe.setMockupJpgUrl(result[0] != null
-                    ? comfyUiService.buildViewUrl(result[0]) : null);
-            wardrobe.setMockupPngUrl(result[1] != null
-                    ? comfyUiService.buildViewUrl(result[1]) : null);
-            wardrobe.setStatus(WardrobeStatus.DONE);
+            if (jpgFilename != null) {
+                wardrobe.setMockupJpgUrl(comfyUiService.buildViewUrl(jpgFilename));
+                wardrobe.setMockupPngUrl(null);
+                wardrobe.setStatus(WardrobeStatus.DONE);
+            } else {
+                // Render timed out — treat as a server error the user can retry.
+                wardrobe.setStatus(WardrobeStatus.FAILED);
+            }
 
         } catch (Exception e) {
             log.error("ComfyUI generation failed for wardrobe id={}", wardrobeId, e);

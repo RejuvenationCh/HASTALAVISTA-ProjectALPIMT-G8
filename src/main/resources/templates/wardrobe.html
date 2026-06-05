@@ -7,6 +7,25 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
     <link rel="stylesheet" th:href="@{/css/wardrobe.css}">
+    <style>
+        .outfit-table-wrap { padding: 32px 48px; }
+        .outfit-table-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; }
+        .outfit-table-head h1 { margin:0; }
+        .outfit-table-head p { color:#777; margin:4px 0 0; }
+        .outfit-table { width:100%; border-collapse:collapse; background:#fff; }
+        .outfit-table th, .outfit-table td { padding:14px 16px; text-align:left; border-bottom:1px solid #eee; vertical-align:middle; }
+        .outfit-table th { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#999; }
+        .outfit-thumb { width:48px; height:64px; object-fit:cover; border-radius:6px; background:#f3f3f3; }
+        .mockup-thumb { width:80px; height:110px; object-fit:cover; border-radius:8px; background:#f3f3f3; }
+        .status-pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:5px 10px; border-radius:999px; }
+        .status-PENDING { background:#fff4e0; color:#b8860b; }
+        .status-DONE    { background:#e7f7ec; color:#1f9d55; }
+        .status-FAILED  { background:#fdecec; color:#c0392b; }
+        .row-fav-btn, .row-del-btn { border:none; background:none; cursor:pointer; font-size:16px; color:#bbb; }
+        .row-fav-btn.active { color:#e63946; }
+        .outfit-empty, .outfit-error { text-align:center; color:#888; padding:60px 0; }
+        .retry-btn { margin-left:8px; border:1px solid #c0392b; color:#c0392b; background:none; border-radius:6px; padding:3px 10px; cursor:pointer; font-size:11px; }
+    </style>
 </head>
 <body>
 
@@ -15,7 +34,8 @@
             <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
         <nav class="nav-links">
-            <a href="/wardrobe" class="active">My Wardrobe</a>
+            <a href="/clothing">Clothing</a>
+            <a href="/wardrobe" class="active">Wardrobe</a>
             <a href="/collection">Collection</a>
             <a href="/generate">Generate</a>
             <a href="/schedule">Schedule</a>
@@ -32,126 +52,43 @@
         </div>
     </header>
 
-    <div class="wardrobe-layout">
-
-        <!-- ── LEFT SIDEBAR ── -->
-        <aside class="wardrobe-sidebar">
-
-            <div class="sidebar-search">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="sidebar-search-input" placeholder="Search items...">
-            </div>
-
+    <main class="outfit-table-wrap">
+        <div class="outfit-table-head">
             <div>
-                <p class="sidebar-section-title">Categories</p>
-                <div class="filter-checkbox-list" id="category-filter-list">
-                    <!-- Populated dynamically from TagService.getTags() -->
-                    <label>
-                        <input type="checkbox" value="all" checked> All Items
-                    </label>
-                </div>
+                <h1>MY WARDROBE</h1>
+                <p>Your generated outfit mockups. Pending jobs refresh automatically.</p>
             </div>
-
-            <div>
-                <p class="sidebar-section-title">Conditions</p>
-                <div class="filter-checkbox-list" id="condition-filter-list">
-                    <!-- Populated dynamically from TagService.getTags() -->
-                </div>
-            </div>
-
-        </aside>
-
-        <!-- ── MAIN CONTENT ── -->
-        <main class="wardrobe-main">
-
-            <div class="wardrobe-main-header">
-                <div>
-                    <h1>MY WARDROBE</h1>
-                    <p>Manage, categorize, and organize your apparel catalog.</p>
-                </div>
-                <button id="open-add-modal-btn" class="add-item-btn" aria-label="Add new item" title="Add Item">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-            </div>
-
-            <div id="wardrobe-grid" class="wardrobe-grid-v2">
-                <!-- IDLE / PENDING: skeleton cards injected by JS -->
-                <!-- SUCCESS: clothing cards injected by JS -->
-                <!-- ERROR: error banner injected by JS -->
-            </div>
-
-        </main>
-    </div>
-
-    <!-- ══════════════════════════════════════════════════════
-         ADD ITEM MODAL
-    ══════════════════════════════════════════════════════ -->
-    <div id="add-item-modal" class="add-modal-overlay" role="dialog" aria-modal="true" aria-label="Add new apparel">
-
-        <div class="add-modal-card">
-            <button id="close-add-modal-btn" class="add-modal-close" aria-label="Close">&times;</button>
-
-            <h2 class="add-modal-title">ADD NEW APPAREL</h2>
-            <p class="add-modal-subtitle">Upload an image and define attributes for your clothing item.</p>
-
-            <form id="add-clothing-form" autocomplete="off" novalidate>
-
-                <!-- Image Upload -->
-                <div class="add-modal-dropzone" id="dropzone-area" role="button" tabindex="0" aria-label="Click to upload clothing image">
-                    <input type="file" id="clothing-file-input" accept="image/*" hidden>
-                    <i class="fa-regular fa-image"></i>
-                    <p>Click to browse or drag &amp; drop</p>
-                    <span>Supports JPG, PNG, JPEG</span>
-                    <img id="dropzone-preview" class="add-modal-dropzone-preview" src="" alt="Clothing preview">
-                </div>
-
-                <!-- Form fields: 2-column grid -->
-                <div class="add-modal-form-grid">
-
-                    <!-- Left column -->
-                    <div>
-                        <div class="add-modal-field" style="margin-bottom: 20px;">
-                            <label for="item-name">Item Name</label>
-                            <input type="text" id="item-name" placeholder="e.g. Cropped Leather Bomber Jacket" required>
-                        </div>
-
-                        <div class="add-modal-field">
-                            <label>Category</label>
-                            <div class="modal-checkbox-grid" id="modal-category-list">
-                                <!-- Populated from TagService.getTags() -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Right column -->
-                    <div>
-                        <div class="add-modal-field" style="margin-bottom: 20px;">
-                            <label for="item-formality">Formality Token (1 = Casual · 5 = Formal)</label>
-                            <input type="number" id="item-formality" min="1" max="5" placeholder="e.g. 3" required>
-                        </div>
-
-                        <div class="add-modal-field">
-                            <label>Condition</label>
-                            <div class="modal-checkbox-grid" id="modal-condition-list">
-                                <!-- Populated from TagService.getTags() -->
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="add-modal-footer">
-                    <button type="button" id="cancel-modal-btn" class="auth-secondary-btn">CANCEL</button>
-                    <button type="submit" id="submit-add-btn" class="auth-primary-btn">ADD TO WARDROBE</button>
-                </div>
-
-            </form>
+            <a href="/generate/new" class="add-item-btn" title="Generate a new outfit">
+                <i class="fa-solid fa-wand-magic-sparkles"></i>
+            </a>
         </div>
-    </div>
 
-    <!-- Script load order matters: state → service → page logic -->
+        <table class="outfit-table">
+            <thead>
+                <tr>
+                    <th>Top</th>
+                    <th>Pants</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                    <th>Mockup</th>
+                    <th>Favorite</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="outfit-table-body">
+                <!-- rows injected by wardrobe-outfits.js -->
+            </tbody>
+        </table>
+
+        <div id="outfit-empty" class="outfit-empty" style="display:none;">
+            <i class="fa-regular fa-images" style="font-size:32px;"></i>
+            <p>No outfits yet. Head to <a href="/generate/new">Generate</a> to create one.</p>
+        </div>
+    </main>
+
     <script th:src="@{/js/app.state.js}"></script>
     <script th:src="@{/js/api.service.js}"></script>
-    <script th:src="@{/js/wardrobe.js}"></script>
+    <script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/js/wardrobe-outfits.js}"></script>
 </body>
 </html>

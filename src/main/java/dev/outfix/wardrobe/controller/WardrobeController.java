@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -65,6 +66,14 @@ public class WardrobeController {
         return ResponseEntity.noContent().build();
     }
 
+    /** PATCH /api/wardrobes/{id}/favorite — toggle the favorite flag. */
+    @PatchMapping("/{id}/favorite")
+    public ResponseEntity<WardrobeResponseDto> toggleFavorite(
+            @PathVariable Long id, Authentication auth) {
+        User user = userService.getByEmail(auth.getName());
+        return ResponseEntity.ok(toDto(wardrobeService.toggleFavorite(id, user)));
+    }
+
     private WardrobeResponseDto toDto(Wardrobe w) {
         return WardrobeResponseDto.builder()
                 .id(w.getId())
@@ -75,6 +84,7 @@ public class WardrobeController {
                 .mockupJpgUrl(w.getMockupJpgUrl())
                 .mockupPngUrl(w.getMockupPngUrl())
                 .status(w.getStatus())
+                .favorite(w.isFavorite())
                 .createdAt(w.getCreatedAt())
                 .build();
     }
@@ -86,6 +96,7 @@ public class WardrobeController {
                 .clothingImageUrl(c.getClothingImageUrl())
                 .tokenFormalitas(c.getTokenFormalitas())
                 .tags(c.getTags())
+                .favorite(c.isFavorite())
                 .build();
     }
 }

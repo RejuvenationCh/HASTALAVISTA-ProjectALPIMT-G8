@@ -72,5 +72,9 @@ public class Wardrobe {
     @Column(nullable = false)
     private WardrobeStatus status;
 
+    @Column(name = "favorite", nullable = false)
+    @Builder.Default
+    private boolean favorite = false;
+
     private LocalDateTime createdAt;
 }

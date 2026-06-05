@@ -1,5 +1,7 @@
 package dev.outfix.schedule.dto;
 
+import java.time.LocalDate;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,6 +15,9 @@ public class UpdateScheduleRequestDto {
 
     /** New activity name. Leave null to keep the current value. */
     private String activityName;
+
+    /** New calendar date. Leave null to keep the current value. */
+    private LocalDate eventDate;
 
     /** New required formality level. Leave null to keep the current value. */
     private Integer targetToken;

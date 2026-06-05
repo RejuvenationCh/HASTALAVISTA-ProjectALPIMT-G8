@@ -1,39 +1,4 @@
-// ── NOTIFICATION MOCK DATA ────────────────────────────────────────────────────
-const NOTIF_STORAGE_KEY = 'outfix_notif_read_ids';
-
-const _mockNotifications = [{
-        id: 'n1',
-        type: 'generation',
-        title: 'Generation Complete',
-        message: 'Your outfit mockup for "Morning Lecture" is ready to view.',
-        time: '2 min ago',
-        read: false
-    },
-    {
-        id: 'n2',
-        type: 'schedule',
-        title: 'Upcoming Event',
-        message: "Team Meeting tomorrow — don't forget to plan your outfit.",
-        time: '1 hour ago',
-        read: false
-    },
-    {
-        id: 'n3',
-        type: 'generation',
-        title: 'Generation Complete',
-        message: 'Your outfit mockup for "Casual Friday" has been generated.',
-        time: '3 hours ago',
-        read: true
-    },
-    {
-        id: 'n4',
-        type: 'schedule',
-        title: 'New Agenda Added',
-        message: 'Campus Event on June 10 — formality token 3 assigned.',
-        time: 'Yesterday',
-        read: true
-    }
-];
+// Notifications are stored client-side by NotificationService (api.service.js).
 
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -44,27 +9,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (bellBtn && notifPanel) {
 
-        // Restore read state from previous page visits
-        const _savedReadIds = JSON.parse(sessionStorage.getItem(NOTIF_STORAGE_KEY) || '[]');
-        _mockNotifications.forEach(n => {
-            if (_savedReadIds.includes(n.id)) n.read = true;
-        });
-
-        const saveReadState = () => {
-            const readIds = _mockNotifications.filter(n => n.read).map(n => n.id);
-            sessionStorage.setItem(NOTIF_STORAGE_KEY, JSON.stringify(readIds));
-        };
-
         const renderNotifPanel = () => {
-            const unread = _mockNotifications.filter(n => !n.read);
-            notifBadge.textContent = unread.length;
-            notifBadge.style.display = unread.length > 0 ? 'flex' : 'none';
+            const list   = NotificationService.getAll();
+            const unread = list.filter(n => !n.read).length;
+            notifBadge.textContent = unread;
+            notifBadge.style.display = unread > 0 ? 'flex' : 'none';
 
-            if (_mockNotifications.length === 0) {
+            if (list.length === 0) {
                 notifPanel.innerHTML = `
-                    <div class="notif-panel-header">
-                        <h3>Notifications</h3>
-                    </div>
+                    <div class="notif-panel-header"><h3>Notifications</h3></div>
                     <div class="notif-empty">
                         <i class="fa-regular fa-bell-slash"></i>
                         You're all caught up.
@@ -72,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            const items = _mockNotifications.map(n => `
+            const items = list.map(n => `
                 <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${n.id}">
                     <div class="notif-icon-wrap ${n.type}">
                         <i class="fa-solid ${n.type === 'generation' ? 'fa-wand-magic-sparkles' : 'fa-calendar-check'}"></i>
@@ -80,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="notif-body">
                         <p class="notif-title">${n.title}</p>
                         <p class="notif-message">${n.message}</p>
-                        <span class="notif-time">${n.time}</span>
+                        <span class="notif-time">${NotificationService.relativeTime(n.createdAt)}</span>
                     </div>
                     ${!n.read ? '<div class="notif-unread-dot"></div>' : ''}
                 </div>`).join('');
@@ -92,39 +45,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="notif-list">${items}</div>`;
 
-            // Mark individual as read on click
             notifPanel.querySelectorAll('.notif-item').forEach(el => {
                 el.addEventListener('click', () => {
-                    const n = _mockNotifications.find(n => n.id === el.dataset.id);
-                    if (n) {
-                        n.read = true;
-                        saveReadState();
-                        renderNotifPanel();
-                    }
+                    NotificationService.markRead(el.dataset.id);
+                    renderNotifPanel();
                 });
             });
 
-            // Mark all as read
             const markAllBtn = document.getElementById('mark-all-read-btn');
             if (markAllBtn) {
                 markAllBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    _mockNotifications.forEach(n => n.read = true);
-                    saveReadState();
+                    NotificationService.markAllRead();
                     renderNotifPanel();
                 });
             }
         };
 
         renderNotifPanel();
+        // Re-render whenever any page pushes a notification (e.g. generation done).
+        document.addEventListener('outfix:notification', renderNotifPanel);
 
-        // Toggle panel open/close
         bellBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             notifPanel.classList.toggle('active');
         });
 
-        // Close when clicking anywhere outside
         document.addEventListener('click', (e) => {
             if (!notifPanel.contains(e.target) && e.target !== bellBtn) {
                 notifPanel.classList.remove('active');
@@ -340,8 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// Wardrobe Javascript
-if (document.getElementById('wardrobe-grid') || document.getElementById('open-add-modal-btn')) {
+// Wardrobe Javascript — superseded by clothing.js. Disabled to avoid double handlers.
+if (false) {
 
     const wardrobeGrid = document.getElementById('wardrobe-grid');
     const emptyState = document.getElementById('empty-state');

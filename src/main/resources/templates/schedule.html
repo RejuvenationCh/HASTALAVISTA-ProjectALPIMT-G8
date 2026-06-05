@@ -19,7 +19,8 @@
             <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
         <nav class="nav-links">
-            <a href="/wardrobe">My Wardrobe</a>
+            <a href="/clothing">Clothing</a>
+            <a href="/wardrobe">Wardrobe</a>
             <a href="/collection">Collection</a>
             <a href="/generate">Generate</a>
             <a href="/schedule" class="active">Schedule</a>
@@ -100,8 +101,19 @@
                 </select>
             </div>
             <div class="form-field-group">
+                <label class="form-field-label" for="inputFormality">Formality (1 = Casual · 5 = Formal)</label>
+                <select class="form-field-select" id="inputFormality">
+                    <option value="">Choose a formality level</option>
+                    <option value="1">1 — Very casual</option>
+                    <option value="2">2 — Casual</option>
+                    <option value="3">3 — Smart / business</option>
+                    <option value="4">4 — Formal</option>
+                    <option value="5">5 — Very formal</option>
+                </select>
+            </div>
+            <div class="form-field-group">
                 <label class="form-field-label" for="inputDate">Date</label>
-                <input type="date" class="form-field-input" id="inputDate" placeholder="dd-mm-yyyy"/>
+                <input type="date" class="form-field-input" id="inputDate" placeholder="yyyy-mm-dd"/>
             </div>
             <div class="form-submit-row">
                 <button class="btn-submit-event" onclick="submitAddEvent()">Add</button>

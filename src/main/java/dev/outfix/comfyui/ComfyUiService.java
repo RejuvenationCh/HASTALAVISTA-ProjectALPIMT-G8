@@ -128,6 +128,69 @@ public class ComfyUiService {
     }
 
     // -----------------------------------------------------------------------
+    // Top + pants try-on (full-outfit workflow with the shoes pass bypassed)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Generates a top + pants try-on by reusing the full-outfit workflow but bypassing
+     * the third (shoes) CatVTON pass entirely. Only passes 1 (top) and 2 (bottom) run.
+     *
+     * @return the output JPG filename from ComfyUI, or null on timeout.
+     */
+    public String generateTopBottom(String faceFilename, String topFilename,
+            String bottomFilename) throws IOException, InterruptedException {
+
+        ObjectNode workflow = buildTopBottomWorkflow(
+                faceFilename, topFilename, bottomFilename);
+
+        String promptId = submitPromptToComfyUi(workflow);
+        log.info("Top+bottom job submitted. prompt_id={}", promptId);
+
+        return pollUntilComplete(promptId, props.getNode().getFullOutfitOutputNodeId());
+    }
+
+    private ObjectNode buildTopBottomWorkflow(String faceFilename,
+            String topFilename, String bottomFilename) throws IOException {
+
+        ComfyUiProperties.Node nodeIds = props.getNode();
+        ObjectNode workflow = loadWorkflowTemplate(
+                "comfyui/workflow_full_outfit_template.json");
+
+        // Load only face, top and bottom — shoes (312) is intentionally left unset.
+        setNodeImageFilename(workflow, nodeIds.getFaceInputId(), faceFilename);
+        setNodeImageFilename(workflow, nodeIds.getTopGarmentInputId(), topFilename);
+        setNodeImageFilename(workflow, nodeIds.getBottomGarmentInputId(), bottomFilename);
+
+        // Seed only the top (pass 1) and bottom (pass 2) passes. Pass 3 (shoes) is bypassed.
+        randomizeSeed(workflow, nodeIds.getCatvtonNodeId());
+        randomizeSeed(workflow, nodeIds.getCatvtonPass2NodeId());
+
+        // Bypass the shoes pass: point the post-processing consumer (normally fed by the
+        // shoes pass 318) at the 2nd pass (316) instead, then drop the PNG output node so
+        // the entire shoes branch (318/319/317/312) is unreferenced and never executes.
+        rewireNodeInput(workflow, nodeIds.getShoesPassConsumerId(), "image",
+                nodeIds.getCatvtonPass2NodeId());
+        workflow.remove(nodeIds.getPngOutputNodeId());
+
+        return workflow;
+    }
+
+    /**
+     * Repoints a node's link input (e.g. "image") to read from a different source node's
+     * output slot 0. Used to bypass the shoes pass in the top+bottom workflow.
+     */
+    private void rewireNodeInput(ObjectNode workflow, String consumerNodeId,
+            String inputName, String sourceNodeId) {
+        if (workflow.get(consumerNodeId) == null) {
+            throw new IllegalStateException(
+                    "Workflow template is missing node id='" + consumerNodeId + "' to rewire. "
+                    + "Check comfyui.node.shoes-pass-consumer-id in application.properties.");
+        }
+        getNodeInputs(workflow, consumerNodeId).set(inputName,
+                objectMapper.createArrayNode().add(sourceNodeId).add(0));
+    }
+
+    // -----------------------------------------------------------------------
     // Shared helpers
     // -----------------------------------------------------------------------
 

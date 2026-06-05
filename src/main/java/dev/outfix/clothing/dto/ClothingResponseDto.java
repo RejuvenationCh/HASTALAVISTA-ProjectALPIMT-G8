@@ -15,4 +15,5 @@ public class ClothingResponseDto {
     private String clothingImageUrl;
     private int tokenFormalitas;
     private String tags;
+    private boolean favorite;
 }

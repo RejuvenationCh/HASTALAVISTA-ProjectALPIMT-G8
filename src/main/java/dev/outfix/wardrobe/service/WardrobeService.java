@@ -47,8 +47,9 @@ public class WardrobeService {
                 .createdAt(LocalDateTime.now())
                 .build());
 
+        // Top + pants only — shoes are optional and ignored by generation.
         boolean canGenerate = owner.getFaceModelUrl() != null
-                && top != null && bottom != null && shoes != null;
+                && top != null && bottom != null;
 
         if (canGenerate) {
             mockupGenerator.generate(wardrobe.getId(), owner);
@@ -73,6 +74,12 @@ public class WardrobeService {
 
     public void delete(Long id, User requestingUser) {
         wardrobeRepository.delete(getById(id, requestingUser));
+    }
+
+    public Wardrobe toggleFavorite(Long id, User requestingUser) {
+        Wardrobe w = getById(id, requestingUser);
+        w.setFavorite(!w.isFavorite());
+        return wardrobeRepository.save(w);
     }
 
     private Schedule resolveSchedule(Long scheduleId, User owner) {

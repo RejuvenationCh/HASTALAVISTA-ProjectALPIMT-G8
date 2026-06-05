@@ -43,5 +43,9 @@ public class Clothing {
     @Column(name = "tags")
     private String tags;
 
+    @Column(name = "favorite", nullable = false)
+    @Builder.Default
+    private boolean favorite = false;
+
     private LocalDateTime createdAt;
 }

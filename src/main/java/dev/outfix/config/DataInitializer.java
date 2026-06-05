@@ -1,5 +1,6 @@
 package dev.outfix.config;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -118,6 +119,16 @@ public class DataInitializer {
                     .tokenFormalitas(1).tags("Men,Top,Sportswear")
                     .createdAt(now).build(),
 
+            // Bottoms (pants)
+            Clothing.builder().user(alice)
+                    .clothingImageUrl(img("men-formal-pants.jpg"))
+                    .tokenFormalitas(3).tags("Men,Bottom,Formal")
+                    .createdAt(now).build(),
+            Clothing.builder().user(alice)
+                    .clothingImageUrl(img("men-casual-pants.jpg"))
+                    .tokenFormalitas(1).tags("Men,Bottom,Casual")
+                    .createdAt(now).build(),
+
             // ── Bob (Women's) ──────────────────────────────────────────────────
 
             // Formal
@@ -146,25 +157,43 @@ public class DataInitializer {
             Clothing.builder().user(bob)
                     .clothingImageUrl(img("women-sport-shoes.jpg"))
                     .tokenFormalitas(1).tags("Women,Footwear,Sportswear")
+                    .createdAt(now).build(),
+
+            // Bottoms (pants)
+            Clothing.builder().user(bob)
+                    .clothingImageUrl(img("women-formal-pants.jpg"))
+                    .tokenFormalitas(3).tags("Women,Bottom,Formal")
+                    .createdAt(now).build(),
+            Clothing.builder().user(bob)
+                    .clothingImageUrl(img("women-casual-pants.jpg"))
+                    .tokenFormalitas(1).tags("Women,Bottom,Casual")
                     .createdAt(now).build()
         ));
     }
 
     private void seedSchedules(ScheduleRepository scheduleRepo, User alice, User bob) {
+        LocalDate today = LocalDate.now();
         scheduleRepo.saveAll(List.of(
             Schedule.builder().user(alice).activityName("Job Interview")
+                    .eventDate(today.plusDays(2))
                     .targetToken(3).targetTag("Formal").build(),
             Schedule.builder().user(alice).activityName("Gym Session")
+                    .eventDate(today.plusDays(1))
                     .targetToken(1).targetTag("Sportswear").build(),
             Schedule.builder().user(alice).activityName("Casual Friday")
+                    .eventDate(today.plusDays(4))
                     .targetToken(1).targetTag("Casual").build(),
             Schedule.builder().user(alice).activityName("Client Dinner")
+                    .eventDate(today.plusDays(6))
                     .targetToken(3).targetTag("Formal").dresscode("Batik").build(),
             Schedule.builder().user(bob).activityName("Business Meeting")
+                    .eventDate(today.plusDays(3))
                     .targetToken(3).targetTag("Formal").build(),
             Schedule.builder().user(bob).activityName("Weekend Brunch")
+                    .eventDate(today.plusDays(5))
                     .targetToken(1).targetTag("Casual").build(),
             Schedule.builder().user(bob).activityName("Morning Run")
+                    .eventDate(today.plusDays(1))
                     .targetToken(1).targetTag("Sportswear").build()
         ));
     }

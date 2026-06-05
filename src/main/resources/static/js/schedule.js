@@ -1,77 +1,33 @@
- const eventStore = {
-     "2026-06-05": [{
-             name: "Lunch Meeting",
-             date: "June 5, 2026",
-             category: "Work"
-         },
-         {
-             name: "Gym Session",
-             date: "June 5, 2026",
-             category: "Sports"
-         }
-     ],
-     "2026-06-07": [{
-             name: "Birthday Party",
-             date: "June 7, 2026",
-             category: "Party"
-         },
-         {
-             name: "Gift Shopping",
-             date: "June 7, 2026",
-             category: "Casual"
-         },
-         {
-             name: "Family Dinner",
-             date: "June 7, 2026",
-             category: "Fine Dining"
-         },
-         {
-             name: "Movie Night",
-             date: "June 7, 2026",
-             category: "Casual"
-         },
-         {
-             name: "Sleepover Prep",
-             date: "June 7, 2026",
-             category: "Casual"
-         },
-         {
-             name: "Cake Decoration",
-             date: "June 7, 2026",
-             category: "Other"
-         },
-         {
-             name: "Game Session",
-             date: "June 7, 2026",
-             category: "Casual"
-         }
-     ],
-     "2026-06-19": [{
-         name: "Team Standup",
-         date: "June 19, 2026",
-         category: "Work"
-     }],
-     "2026-06-20": [{
-             name: "College Class",
-             date: "June 20, 2026",
-             category: "College"
-         },
-         {
-             name: "Study Group",
-             date: "June 20, 2026",
-             category: "College"
-         },
-         {
-             name: "Library Visit",
-             date: "June 20, 2026",
-             category: "Casual"
-         }
-     ]
- };
+ // Populated from the backend (GET /api/schedules) by loadSchedulesFromBackend().
+ // Shape: { "yyyy-mm-dd": [ { id, name, date, category, targetToken } ] }
+ let eventStore = {};
 
 flatpickr("#inputDate", {
-    dateFormat: "d-m-Y"
+    dateFormat: "Y-m-d"
 });
+
+/** Loads the user's schedules from the backend and groups them by date. */
+async function loadSchedulesFromBackend() {
+    try {
+        const schedules = await AgendaService.getAgendas();
+        eventStore = {};
+        schedules.forEach(s => {
+            if (!s.eventDate) return;
+            const key = s.eventDate; // backend returns ISO yyyy-mm-dd
+            if (!eventStore[key]) eventStore[key] = [];
+            eventStore[key].push({
+                id: s.id,
+                name: s.activityName,
+                date: toDisplayDate(key),
+                category: s.targetTag,
+                targetToken: s.targetToken
+            });
+        });
+        rebuildCalendarDayCells();
+    } catch (err) {
+        console.error('Failed to load schedules', err);
+    }
+}
 
 let currentSelectedDate = null;
 
@@ -293,10 +249,11 @@ function buildCalendar() {
      }
  });
 
- function submitAddEvent() {
+ async function submitAddEvent() {
      const name = document.getElementById("inputName").value.trim();
      const category = document.getElementById("inputCategory").value;
      const dateKey = document.getElementById("inputDate").value;
+     const formality = parseInt(document.getElementById("inputFormality").value, 10);
 
      if (!name) {
          alert("Please enter an event name.");
@@ -310,24 +267,23 @@ function buildCalendar() {
          alert("Please pick a date.");
          return;
      }
-
-     const newEvent = {
-         name: name,
-         date: toDisplayDate(dateKey),
-         category: category
-     };
-
-     // Insert into the store
-     if (!eventStore[dateKey]) {
-         eventStore[dateKey] = [];
+     if (!formality || formality < 1 || formality > 5) {
+         alert("Please choose a formality level between 1 and 5.");
+         return;
      }
-     eventStore[dateKey].push(newEvent);
 
-     // Rebuild the calendar so event count badges update
-     rebuildCalendarDayCells();
-
-     // Close all modals
-     closeAllModals();
+     try {
+         await AgendaService.addAgenda({
+             activityName: name,
+             eventDate: dateKey,
+             targetToken: formality,
+             targetTag: category
+         });
+         closeAllModals();
+         await loadSchedulesFromBackend();
+     } catch (err) {
+         alert("Could not save event: " + err.message);
+     }
  }
 
  function rebuildCalendarDayCells() {
@@ -351,3 +307,4 @@ function buildCalendar() {
  }
 
  buildCalendar();
+ loadSchedulesFromBackend();

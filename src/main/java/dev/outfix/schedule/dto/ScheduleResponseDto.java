@@ -1,5 +1,7 @@
 package dev.outfix.schedule.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +20,9 @@ public class ScheduleResponseDto {
 
     /** Short description of the activity. */
     private String activityName;
+
+    /** The calendar date for this activity (ISO yyyy-MM-dd). */
+    private LocalDate eventDate;
 
     /** The formality level required to match wardrobe items. */
     private int targetToken;

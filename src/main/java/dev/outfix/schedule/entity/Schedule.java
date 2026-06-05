@@ -1,5 +1,7 @@
 package dev.outfix.schedule.entity;
 
+import java.time.LocalDate;
+
 import dev.outfix.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,6 +44,10 @@ public class Schedule {
     /** A short description of the activity (e.g. "Job Interview", "Gym"). */
     @Column(name = "activity_name", nullable = false)
     private String activityName;
+
+    /** The calendar date this activity is scheduled for. Drives the schedule calendar. */
+    @Column(name = "event_date")
+    private LocalDate eventDate;
 
     /**
      * The required formality level for this activity.

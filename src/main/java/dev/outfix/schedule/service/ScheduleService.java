@@ -28,6 +28,7 @@ public class ScheduleService {
         Schedule newSchedule = Schedule.builder()
                 .user(owner)
                 .activityName(request.getActivityName())
+                .eventDate(request.getEventDate())
                 .targetToken(request.getTargetToken())
                 .targetTag(request.getTargetTag())
                 .dresscode(request.getDresscode())
@@ -70,6 +71,9 @@ public class ScheduleService {
 
         if (request.getActivityName() != null) {
             schedule.setActivityName(request.getActivityName());
+        }
+        if (request.getEventDate() != null) {
+            schedule.setEventDate(request.getEventDate());
         }
         if (request.getTargetToken() != null) {
             schedule.setTargetToken(request.getTargetToken());

@@ -1,42 +1,105 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Outfix - Generate</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    <link rel="stylesheet" href="/css/style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Outfix - Generate</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="icon" href="/image/LOGO.png" />
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
-<body>
-    <header class="navbar">
-        <div class="logo">
-            <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
-        </div>
-        <nav class="nav-links">
-            <a href="/wardrobe">My Wardrobe</a>
-            <a href="/collection">Collection</a>
-            <a href="/generate" class="active">Generate</a>
-            <a href="/schedule">Schedule</a>
-        </nav>
-        <div class="nav-actions">
-            <div class="notif-bell-wrap">
-                <button class="icon-btn" id="notif-bell-btn" aria-label="Notifications">
-                    <i class="fa-regular fa-bell"></i>
-                </button>
-                <span class="notif-badge" id="notif-badge">2</span>
-                <div class="notif-panel" id="notif-panel"></div>
-            </div>
-            <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
-        </div>
-    </header>
+<body class="outfix-studio">
 
-    <main class="generate-section">
-        <img src="/image/GENERATE YOURS.jpg" alt="Generate Yours" class="generate-banner">
-        <button class="create-now-btn">Create Now</button>
-    </main>
+  <header class="navbar">
+    <div class="logo">
+      <a href="/"><img src="/image/LOGO.png" alt="Outfix Logo"></a>
+    </div>
+    <nav class="nav-links">
+      <a href="/wardrobe">My Wardrobe</a>
+      <a href="/collection">Collection</a>
+      <a href="/generate" class="active">Generate</a>
+      <a href="/schedule">Schedule</a>
+    </nav>
+    <div class="nav-actions">
+      <div class="notif-bell-wrap">
+        <button class="icon-btn" id="notif-bell-btn" aria-label="Notifications">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <span class="notif-badge" id="notif-badge">2</span>
+        <div class="notif-panel" id="notif-panel"></div>
+      </div>
+      <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
+    </div>
+  </header>
 
-    <script src="/js/app.state.js"></script>
-    <script src="/js/api.service.js"></script>
-    <script src="/js/script.js"></script>
+  <main class="gen" id="generate-page" data-state="default">
+
+    <div class="gen__stage">
+      <!-- default headline -->
+      <div class="gen__hero">
+        <h1>Generate your Outfit<br />recommendation.</h1>
+        <p>Tell OUTFIX the vibe, the weather or the occasion — we'll style a full look from your wardrobe in one tap.</p>
+      </div>
+
+      <section class="gen__result" aria-live="polite">
+        <h2>Generate Result</h2>
+        <div class="result-box" id="result-box">
+        </div>
+      </section>
+
+      <div class="grid-floor" aria-hidden="true"></div>
+    </div>
+
+    <div class="composer-wrap">
+      <form class="composer" id="composer" autocomplete="off">
+        <button type="button" class="composer__add" data-toast="Attach an item or photo" aria-label="Add">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+        </button>
+
+        <div class="source" id="source">
+          <button type="button" class="source__btn" id="source-btn" aria-haspopup="true" aria-expanded="false">
+            <span id="source-label">My Wardrobe</span>
+            <svg class="icon chev" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m6 15 6-6 6 6" />
+            </svg>
+          </button>
+          <div class="source__menu" role="menu">
+            <button type="button" role="menuitemradio" aria-checked="true" data-value="My Wardrobe">
+              My Wardrobe <span class="tick">✓</span>
+            </button>
+            <button type="button" role="menuitemradio" aria-checked="false" data-value="My Collection">
+              My Collection <span class="tick">✓</span>
+            </button>
+            <button type="button" role="menuitemradio" aria-checked="false" data-value="Marketplace">
+              Marketplace <span class="tick">✓</span>
+            </button>
+            <button type="button" role="menuitemradio" aria-checked="false" data-value="Surprise me">
+              Surprise me <span class="tick">✓</span>
+            </button>
+          </div>
+        </div>
+
+        <input class="composer__input" id="composer-input" type="text"
+               placeholder="Describe the look you want…" />
+
+        <button type="submit" class="composer__send" id="composer-send" aria-label="Generate">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="/js/app.state.js"></script>
+  <script src="/js/api.service.js"></script>
+  <script src="/js/script.js"></script>
 </body>
 </html>

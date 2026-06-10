@@ -13,7 +13,6 @@ html {
 body {
     background-color: #ffffff;
     color: #000;
-    overflow-x: hidden;
     width: 100%;
     max-width: 100%;
 }

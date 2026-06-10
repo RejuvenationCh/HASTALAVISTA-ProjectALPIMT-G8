@@ -451,7 +451,7 @@
 }
 
 .add-modal-field input[type="text"],
-.add-modal-field input[type="number"] {
+.add-modal-field select {
     width: 100%;
     padding: 11px 14px;
     border: 1px solid #000;
@@ -462,11 +462,24 @@
 }
 
 .add-modal-field input[type="text"]:focus,
-.add-modal-field input[type="number"]:focus {
+.add-modal-field select:focus {
     background: #fafafa;
 }
 
-/* Single-select checkbox groups inside modal */
+/* Native select, themed to match the modal's flat black inputs */
+.add-modal-field select {
+    height: 41px;
+    background-color: #fff;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%23000' stroke-width='1.5' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 36px;
+}
+
+/* Checkbox groups inside the modal (gender single-select, category multi-select) */
 .modal-checkbox-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -489,6 +502,16 @@
     height: 14px;
     accent-color: #000;
     cursor: pointer;
+}
+
+/* Category disabled because it doesn't fit the chosen formality */
+.modal-checkbox-grid label.is-disabled {
+    opacity: .35;
+    cursor: not-allowed;
+}
+
+.modal-checkbox-grid label.is-disabled input[type="checkbox"] {
+    cursor: not-allowed;
 }
 
 /* Modal footer */
@@ -637,6 +660,19 @@
     .modal-checkbox-grid {
         grid-template-columns: 1fr;
         gap: 6px;
+    }
+
+    /* Stack the footer buttons so neither gets clipped on narrow screens */
+    .add-modal-footer {
+        flex-direction: column-reverse;
+        gap: 10px;
+    }
+
+    .add-modal-footer .auth-primary-btn,
+    .add-modal-footer .auth-secondary-btn {
+        width: 100%;
+        padding: 13px 20px;
+        letter-spacing: 1px;
     }
 }
 

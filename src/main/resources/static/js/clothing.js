@@ -17,11 +17,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const dropzonePreview   = document.getElementById('dropzone-preview');
     const searchInput       = document.getElementById('sidebar-search-input');
     const categoryList      = document.getElementById('category-filter-list');
+    const genderList        = document.getElementById('gender-filter-list');
+    const formalityList     = document.getElementById('formality-filter-list');
     const conditionList     = document.getElementById('condition-filter-list');
     const modalCategoryList = document.getElementById('modal-category-list');
+    const modalGenderList   = document.getElementById('modal-gender-list');
     const modalConditionList= document.getElementById('modal-condition-list');
+    const formalitySelect   = document.getElementById('item-formality');
 
-    let uploadedImageSrc = '';
+    // Tags that belong in the dedicated Gender section, not the Category grid.
+    const GENDER_TAGS = ['Men', 'Women', 'Unisex'];
+    // Style tags now decided by the Formality dropdown — kept out of the Category grid.
+    const STYLE_TAGS = ['Formal', 'Casual'];
+    // Categories that don't fit a formal event; disabled when Formality >= FORMAL_LEVEL.
+    const NON_FORMAL_CATEGORIES = ['Sportswear'];
+    const FORMAL_LEVEL = 4;
+    // Sidebar "Formality" section filters by the F1–F5 token shown on each card.
+    const FORMALITY_LEVELS = [
+        { value: 1, label: 'F1 · Loungewear' },
+        { value: 2, label: 'F2 · Casual' },
+        { value: 3, label: 'F3 · Smart casual' },
+        { value: 4, label: 'F4 · Formal' },
+        { value: 5, label: 'F5 · Very formal' }
+    ];
 
     initPage();
 
@@ -47,16 +65,31 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderSidebarFilters() {
+        // Categories = garment types only; Gender and Formality get their own sections.
+        const genderTags  = AppState.tags.categories.filter(t => GENDER_TAGS.includes(t));
+        const garmentTags = AppState.tags.categories.filter(
+            t => !GENDER_TAGS.includes(t) && !STYLE_TAGS.includes(t));
+
+        const checkboxRow = (name, val, label) => `
+            <label>
+                <input type="checkbox" name="${name}" value="${val}"> ${label}
+            </label>`;
+
         categoryList.innerHTML = `
             <label>
                 <input type="checkbox" name="sidebar-category" value="all" checked> All Items
             </label>`;
-        AppState.tags.categories.forEach(cat => {
-            categoryList.insertAdjacentHTML('beforeend', `
-                <label>
-                    <input type="checkbox" name="sidebar-category" value="${cat}"> ${cat}
-                </label>`);
-        });
+        garmentTags.forEach(cat =>
+            categoryList.insertAdjacentHTML('beforeend', checkboxRow('sidebar-category', cat, cat)));
+
+        genderList.innerHTML = '';
+        genderTags.forEach(g =>
+            genderList.insertAdjacentHTML('beforeend', checkboxRow('sidebar-category', g, g)));
+
+        // Formality filters by the F1–F5 token (item.tokenFormalitas), not a tag.
+        formalityList.innerHTML = '';
+        FORMALITY_LEVELS.forEach(lvl =>
+            formalityList.insertAdjacentHTML('beforeend', checkboxRow('sidebar-formality', lvl.value, lvl.label)));
 
         conditionList.innerHTML = '';
         AppState.tags.conditions.forEach(cond => {
@@ -70,8 +103,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderModalCheckboxes() {
+        // Gender → its own single-select section.
+        const genderTags = AppState.tags.categories.filter(t => GENDER_TAGS.includes(t));
+        // Category → garment types only (gender + style tags excluded). Multi-select.
+        const categoryTags = AppState.tags.categories.filter(
+            t => !GENDER_TAGS.includes(t) && !STYLE_TAGS.includes(t));
+
+        modalGenderList.innerHTML = '';
+        genderTags.forEach(g => {
+            modalGenderList.insertAdjacentHTML('beforeend', `
+                <label>
+                    <input type="checkbox" name="modal-gender" value="${g}"> ${g}
+                </label>`);
+        });
+
         modalCategoryList.innerHTML = '';
-        AppState.tags.categories.forEach(cat => {
+        categoryTags.forEach(cat => {
             modalCategoryList.insertAdjacentHTML('beforeend', `
                 <label>
                     <input type="checkbox" name="modal-category" value="${cat}"> ${cat}
@@ -86,8 +133,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 </label>`);
         });
 
-        enforceSingleSelect(modalCategoryList, 'modal-category');
+        // Gender & condition stay single-select; category is now multi-select.
+        enforceSingleSelect(modalGenderList, 'modal-gender');
         enforceSingleSelect(modalConditionList, 'modal-condition');
+
+        applyFormalityConstraints();
     }
 
     function enforceSingleSelect(container, name) {
@@ -99,22 +149,55 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Disable (and clear) categories that don't fit a formal event when Formality >= 4.
+    function applyFormalityConstraints() {
+        const formality = parseInt(formalitySelect.value, 10);
+        const isFormal = formality >= FORMAL_LEVEL;
+        modalCategoryList.querySelectorAll('input[name="modal-category"]').forEach(cb => {
+            const disable = isFormal && NON_FORMAL_CATEGORIES.includes(cb.value);
+            cb.disabled = disable;
+            if (disable) cb.checked = false;
+            cb.closest('label').classList.toggle('is-disabled', disable);
+        });
+    }
+
+    formalitySelect.addEventListener('change', applyFormalityConstraints);
+
     // — SIDEBAR FILTER LISTENERS —
-    function attachFilterListeners() {
-        categoryList.addEventListener('change', (e) => {
-            if (e.target.name !== 'sidebar-category') return;
-            if (e.target.value === 'all') {
-                categoryList.querySelectorAll('input[name="sidebar-category"]').forEach(cb => {
-                    cb.checked = cb.value === 'all';
-                });
-                AppState.wardrobe.activeCategory = 'all';
+    // Categories and Gender both drive the single activeCategory (tag) filter,
+    // so selecting any one tag clears the others across both sections.
+    const categorySections = [categoryList, genderList];
+
+    function onCategoryFilterChange(e) {
+        if (e.target.name !== 'sidebar-category') return;
+        const inputs = categorySections.flatMap(
+            list => [...list.querySelectorAll('input[name="sidebar-category"]')]);
+        const allItemsCb = categoryList.querySelector('input[value="all"]');
+
+        if (e.target.value === 'all') {
+            inputs.forEach(cb => { cb.checked = cb.value === 'all'; });
+            AppState.wardrobe.activeCategory = 'all';
+        } else {
+            inputs.forEach(cb => { cb.checked = cb === e.target && e.target.checked; });
+            if (e.target.checked) {
+                AppState.wardrobe.activeCategory = e.target.value;
             } else {
-                categoryList.querySelector('input[value="all"]').checked = false;
-                AppState.wardrobe.activeCategory = e.target.checked ? e.target.value : 'all';
-                if (!e.target.checked) {
-                    categoryList.querySelector('input[value="all"]').checked = true;
-                }
+                allItemsCb.checked = true;
+                AppState.wardrobe.activeCategory = 'all';
             }
+        }
+        renderGrid();
+    }
+
+    function attachFilterListeners() {
+        categorySections.forEach(list => list.addEventListener('change', onCategoryFilterChange));
+
+        formalityList.addEventListener('change', (e) => {
+            if (e.target.name !== 'sidebar-formality') return;
+            AppState.wardrobe.activeFormality = e.target.checked ? parseInt(e.target.value, 10) : 'all';
+            formalityList.querySelectorAll('input[name="sidebar-formality"]').forEach(cb => {
+                if (cb !== e.target) cb.checked = false;
+            });
             renderGrid();
         });
 
@@ -170,12 +253,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const query      = searchInput.value.trim().toLowerCase();
         const catFilter  = AppState.wardrobe.activeCategory;
         const condFilter = AppState.wardrobe.activeCondition;
+        const formFilter = AppState.wardrobe.activeFormality;
 
         const filtered = AppState.wardrobe.items.filter(item => {
             const matchCat  = catFilter  === 'all' || item.tags.includes(catFilter);
             const matchCond = condFilter === 'all' || item.condition === condFilter;
+            const matchForm = formFilter === 'all' || item.tokenFormalitas === formFilter;
             const matchQ    = !query || item.name.toLowerCase().includes(query);
-            return matchCat && matchCond && matchQ;
+            return matchCat && matchCond && matchForm && matchQ;
         });
 
         if (filtered.length === 0) {
@@ -254,6 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addForm.reset();
         resetDropzone();
         setSubmitIdle();
+        applyFormalityConstraints();   // reset() clears the dropdown → re-enable all categories
     };
 
     openModalBtn.addEventListener('click', openModal);
@@ -268,8 +354,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        uploadedImageSrc = URL.createObjectURL(file);
-        dropzonePreview.src = uploadedImageSrc;
+        dropzonePreview.src = URL.createObjectURL(file);
         dropzonePreview.classList.add('visible');
         dropzone.querySelector('i').style.display = 'none';
         dropzone.querySelector('p').style.display = 'none';
@@ -289,7 +374,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     function resetDropzone() {
-        uploadedImageSrc = '';
         dropzonePreview.src = '';
         dropzonePreview.classList.remove('visible');
         dropzone.querySelector('i').style.display = '';
@@ -307,21 +391,24 @@ document.addEventListener('DOMContentLoaded', () => {
     addForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const name       = document.getElementById('item-name').value.trim();
-        const formality  = parseInt(document.getElementById('item-formality').value, 10);
-        const categoryEl = modalCategoryList.querySelector('input[name="modal-category"]:checked');
+        const name        = document.getElementById('item-name').value.trim();
+        const formality   = parseInt(formalitySelect.value, 10);
+        const genderEl    = modalGenderList.querySelector('input[name="modal-gender"]:checked');
+        const categoryEls = modalCategoryList.querySelectorAll('input[name="modal-category"]:checked');
 
         if (!name) { alert('Please enter an item name.'); return; }
-        if (!categoryEl) { alert('Please select a category.'); return; }
-        if (!formality || formality < 1 || formality > 5) { alert('Please enter a formality token between 1 and 5.'); return; }
+        if (!formality || formality < 1 || formality > 5) { alert('Please select a formality level.'); return; }
+        if (!genderEl) { alert('Please select a gender.'); return; }
+        if (categoryEls.length === 0) { alert('Please select at least one category.'); return; }
 
-        const category = categoryEl.value;
+        const tags = [genderEl.value, ...Array.from(categoryEls, el => el.value)];
         setSubmitPending();
 
         try {
             const newItem = await ClothingService.addItem({
+                name,
                 tokenFormalitas: formality,
-                tags: [category],
+                tags,
                 file: fileInput.files[0] || null
             });
             AppState.wardrobe.items.unshift(newItem);

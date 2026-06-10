@@ -40,13 +40,37 @@ async function upload(method, path, formData) {
     return data;
 }
 
+/**
+ * Item names aren't persisted by the backend (the Clothing entity has no name
+ * column), so we keep user-typed names client-side, keyed by the item id.
+ */
+const ClothingNames = {
+    _key: 'outfix_clothing_names',
+    _read() {
+        try { return JSON.parse(localStorage.getItem(this._key) || '{}'); }
+        catch { return {}; }
+    },
+    _write(map) { localStorage.setItem(this._key, JSON.stringify(map)); },
+    get(id)  { return this._read()[id] || null; },
+    set(id, name) {
+        if (id == null || !name) return;
+        const map = this._read();
+        map[id] = name;
+        this._write(map);
+    },
+    remove(id) {
+        const map = this._read();
+        delete map[id];
+        this._write(map);
+    }
+};
+
 /** Maps a backend ClothingResponseDto → the shape the clothing grid expects. */
 function toClothingItem(c) {
     const tagArray = c.tags ? c.tags.split(',').map(t => t.trim()) : [];
     return {
         id:              c.id,
-        name:            tagArray.join(' · ') || 'Clothing item',
-        category:        tagArray[0] || '',
+        name:            ClothingNames.get(c.id) || tagArray.join(' · ') || 'Clothing item',
         condition:       'N/A',
         tokenFormalitas: c.tokenFormalitas,
         tags:            tagArray,
@@ -133,17 +157,22 @@ const ClothingService = {
     },
 
     /** POST /api/clothing  (multipart: file?, tokenFormalitas, tags) */
-    addItem: async ({ tokenFormalitas, tags, file }) => {
+    addItem: async ({ name, tokenFormalitas, tags, file }) => {
         const fd = new FormData();
         if (file) fd.append('file', file);
         fd.append('tokenFormalitas', tokenFormalitas);
         fd.append('tags', Array.isArray(tags) ? tags.join(',') : tags);
         const item = await upload('POST', '/api/clothing', fd);
+        ClothingNames.set(item.id, name);   // backend has no name column; keep it client-side
         return toClothingItem(item);
     },
 
     /** DELETE /api/clothing/{id} */
-    deleteItem: async (id) => request('DELETE', `/api/clothing/${id}`),
+    deleteItem: async (id) => {
+        const res = await request('DELETE', `/api/clothing/${id}`);
+        ClothingNames.remove(id);
+        return res;
+    },
 
     /** PATCH /api/clothing/{id}/favorite */
     toggleFavorite: async (id) => toClothingItem(await request('PATCH', `/api/clothing/${id}/favorite`))

@@ -204,9 +204,6 @@ function buildCalendar() {
          const card = document.createElement("div");
          card.className = "event-card";
          card.innerHTML = `
-          <div class="event-card-image">
-            <i class="bi bi-image"></i>
-          </div>
           <div class="event-card-info">
             <div class="event-name">${escapeHtml(event.name)}</div>
             <div class="event-date-display">${escapeHtml(event.date)}</div>

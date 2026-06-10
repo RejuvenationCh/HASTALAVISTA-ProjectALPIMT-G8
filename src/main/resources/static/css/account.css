@@ -63,6 +63,35 @@
     cursor: pointer;
 }
 
+/* — Logged-in account info — */
+.account-user {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    min-width: 0;          /* allow the block to shrink so the email can wrap */
+}
+
+.account-user .account-card-text {
+    min-width: 0;
+}
+
+.account-user .account-card-text p {
+    overflow-wrap: anywhere;   /* long emails wrap instead of overflowing the card */
+}
+
+.account-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: #555;
+    flex-shrink: 0;
+}
+
 .mix-empty-state {
     text-align: center;
     padding: 60px 0;
@@ -73,6 +102,76 @@
     font-size: 40px;
     margin-bottom: 10px;
     color: #ccc;
+}
+
+/* — My Mix list (generated outfits) — */
+.mix-grid {
+    display: grid;
+    /* min(220px, 100%) keeps the column from ever exceeding the card width
+       on narrow screens, so cards never spill past the container. */
+    grid-template-columns: repeat(auto-fill, minmax(min(220px, 100%), 1fr));
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.mix-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    background: #fff;
+}
+
+.mix-card-img {
+    width: 72px;
+    height: 72px;
+    flex-shrink: 0;
+    border-radius: 6px;
+    overflow: hidden;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mix-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.mix-card-placeholder {
+    color: #ccc;
+    font-size: 24px;
+}
+
+.mix-card-body {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.mix-card-status {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+.mix-card-status.status-DONE   { color: #1a7f37; }
+.mix-card-status.status-FAILED { color: #c0392b; }
+.mix-card-status.status-PENDING{ color: #b07d00; }
+
+.mix-card-event {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* — RESPONSIVE — */

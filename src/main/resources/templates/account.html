@@ -40,7 +40,7 @@
     <main class="account-container">
         <h1>My Account</h1>
 
-        <div class="account-card">
+        <div class="account-card" id="account-auth-card">
             <div class="account-card-header">
                 <div class="account-card-text">
                     <h3>Get the most out of your visit</h3>
@@ -55,12 +55,14 @@
 
         <div class="account-card">
             <div class="account-card-text">
-                <h3>My Mix (0)</h3>
+                <h3 id="mix-title">My Mix (0)</h3>
             </div>
-            <div class="mix-empty-state">
-                <i class="fa-solid fa-box-archive"></i>
-                <p><strong>No Mixing found</strong></p>
-                <p>Mix a Wardrobe to see it listed here.</p>
+            <div id="mix-body">
+                <div class="mix-empty-state">
+                    <i class="fa-solid fa-box-archive"></i>
+                    <p><strong>No Mixing found</strong></p>
+                    <p>Mix a Wardrobe to see it listed here.</p>
+                </div>
             </div>
         </div>
     </main>
@@ -112,5 +114,6 @@
     <script th:src="@{/js/app.state.js}"></script>
     <script th:src="@{/js/api.service.js}"></script>
     <script th:src="@{/js/script.js}"></script>
+    <script th:src="@{/js/account.js}"></script>
 </body>
 </html>

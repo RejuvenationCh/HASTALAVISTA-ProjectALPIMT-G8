@@ -14,6 +14,7 @@ const AppState = {
         items: [],
         activeCategory: 'all',
         activeCondition: 'all',
+        activeFormality: 'all',
         error: null
     },
     tags: {

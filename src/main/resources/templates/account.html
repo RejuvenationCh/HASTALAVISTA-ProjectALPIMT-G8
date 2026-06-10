@@ -6,13 +6,14 @@
     <title>Outfix - My Account</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/account.css}">
 </head>
 <body class="account-body">
     <header class="navbar">
         <div class="logo">
             <a href="/"><img th:src="@{/image/LOGO.png}" alt="Outfix Logo"></a>
         </div>
-        <nav class="nav-links">
+        <nav class="nav-links" id="nav-links">
             <a href="/clothing">Clothing</a>
             <a href="/wardrobe">Wardrobe</a>
             <a href="/collection">Collection</a>
@@ -28,6 +29,11 @@
                 <div class="notif-panel" id="notif-panel"></div>
             </div>
             <a href="/account" class="icon-btn"><i class="fa-regular fa-user"></i></a>
+            <button class="hamburger-btn" id="hamburger-btn" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
         </div>
     </header>
 
@@ -65,7 +71,7 @@
 
             <div id="login-form-container">
                 <h2>Login</h2>
-                <p id="login-error" style="color:#cc0000;display:none;font-size:13px;margin-bottom:10px;"></p>
+                <p id="login-error" class="auth-error"></p>
                 <div class="input-group">
                     <i class="fa-regular fa-user"></i>
                     <input type="text" id="login-email" placeholder="Email">
@@ -82,7 +88,7 @@
 
             <div id="signup-form-container" style="display: none;">
                 <h2>Register</h2>
-                <p id="signup-error" style="color:#cc0000;display:none;font-size:13px;margin-bottom:10px;"></p>
+                <p id="signup-error" class="auth-error"></p>
                 <div class="input-group">
                     <i class="fa-regular fa-user"></i>
                     <input type="text" id="signup-name" placeholder="Your Full Name">

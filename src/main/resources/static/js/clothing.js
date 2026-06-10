@@ -4,7 +4,7 @@
  */
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ── DOM refs ──────────────────────────────────────────────────────────────
+    // — DOM refs —
     const grid              = document.getElementById('wardrobe-grid');
     const openModalBtn      = document.getElementById('open-add-modal-btn');
     const closeModalBtn     = document.getElementById('close-add-modal-btn');
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadItems();
     }
 
-    // ── TAG LOADING ───────────────────────────────────────────────────────────
+    // — TAG LOADING —
     async function loadTags() {
         AppState.tags.status = 'PENDING';
         try {
@@ -99,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── SIDEBAR FILTER LISTENERS ──────────────────────────────────────────────
+    // — SIDEBAR FILTER LISTENERS —
     function attachFilterListeners() {
         categoryList.addEventListener('change', (e) => {
             if (e.target.name !== 'sidebar-category') return;
@@ -130,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         searchInput.addEventListener('input', () => renderGrid());
     }
 
-    // ── ITEM LOADING ──────────────────────────────────────────────────────────
+    // — ITEM LOADING —
     async function loadItems() {
         AppState.wardrobe.status = 'PENDING';
         renderGrid();
@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderGrid();
     }
 
-    // ── GRID RENDERING ────────────────────────────────────────────────────────
+    // — GRID RENDERING —
     function renderGrid() {
         grid.innerHTML = '';
 
@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── FAVORITE ──────────────────────────────────────────────────────────────
+    // — FAVORITE —
     async function handleFavorite(id) {
         try {
             const updated = await ClothingService.toggleFavorite(id);
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── DELETE ────────────────────────────────────────────────────────────────
+    // — DELETE —
     async function handleDelete(id) {
         if (!confirm('Remove this item from your clothing?')) return;
         try {
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // ── MODAL OPEN / CLOSE ────────────────────────────────────────────────────
+    // — MODAL OPEN / CLOSE —
     const openModal  = () => addModal.classList.add('active');
     const closeModal = () => {
         addModal.classList.remove('active');
@@ -261,7 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     cancelModalBtn.addEventListener('click', closeModal);
     addModal.addEventListener('click', (e) => { if (e.target === addModal) closeModal(); });
 
-    // ── DROPZONE ──────────────────────────────────────────────────────────────
+    // — DROPZONE —
     dropzone.addEventListener('click', () => fileInput.click());
     dropzone.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') fileInput.click(); });
 
@@ -298,12 +298,12 @@ document.addEventListener('DOMContentLoaded', () => {
         fileInput.value = '';
     }
 
-    // ── SUBMIT STATE HELPERS ──────────────────────────────────────────────────
+    // — SUBMIT STATE HELPERS —
     function setSubmitPending() { submitBtn.disabled = true;  submitBtn.innerHTML = '<span class="btn-spinner"></span> SAVING...'; }
     function setSubmitIdle()    { submitBtn.disabled = false; submitBtn.innerHTML = 'ADD TO CLOTHING'; }
     function setSubmitError()   { submitBtn.disabled = false; submitBtn.innerHTML = 'TRY AGAIN'; }
 
-    // ── FORM SUBMIT ───────────────────────────────────────────────────────────
+    // — FORM SUBMIT —
     addForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 

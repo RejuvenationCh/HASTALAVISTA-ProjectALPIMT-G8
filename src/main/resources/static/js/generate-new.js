@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         await loadEvents();
     }
 
-    // ── STEP 0: Face ID ───────────────────────────────────────────────────────
+    // — STEP 0: Face ID —
     async function checkFace() {
         try {
             const me = await UserService.getMe();
@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ── STEP 1: Events ────────────────────────────────────────────────────────
+    // — STEP 1: Events —
     async function loadEvents() {
         try {
             const events = await AgendaService.getAgendas();
@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendBt.disabled = !eventSelect.value;
     });
 
-    // ── STEP 2: Recommendation ────────────────────────────────────────────────
+    // — STEP 2: Recommendation —
     recommendBt.addEventListener('click', async () => {
         const scheduleId = eventSelect.value;
         if (!scheduleId) return;
@@ -134,7 +134,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recoGrid.innerHTML = recoCard('Top', reco.top) + recoCard('Pants', reco.bottom);
     }
 
-    // ── STEP 3: Generate + poll ───────────────────────────────────────────────
+    // — STEP 3: Generate + poll —
     function refreshGenerateEnabled() {
         const ready = hasFace && currentReco && currentReco.top && currentReco.bottom;
         if (generateBt) generateBt.disabled = !ready;

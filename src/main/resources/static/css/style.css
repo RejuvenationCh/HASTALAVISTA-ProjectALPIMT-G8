@@ -6,18 +6,23 @@
     font-family: 'SF Pro', sans-serif;
 }
 
+html {
+    overflow-x: hidden;
+}
+
 body {
     background-color: #ffffff;
     color: #000;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
 }
 
 ::-webkit-scrollbar {
-        display: none;
-    }
-/* =========================================
-   NAVBAR STYLES
-   ========================================= */
+    display: none;
+}
+
+/* — NAVBAR — */
 .navbar {
     position: sticky;
     top: 0;
@@ -76,161 +81,7 @@ body {
     color: #000;
 }
 
-/* =========================================
-   SLIDER SECTION (HOME)
-   ========================================= */
-.slider-container {
-    position: relative;
-    width: 100%;
-    height: calc(100vh - 101px);
-    overflow: hidden;
-    background-color: #fff;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.slides-wrapper {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    transition: transform 0.8s ease-in-out;
-}
-
-.slide {
-    min-width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.full-slide-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    object-position: center;
-}
-
-.slider-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: transparent;
-    border: none;
-    color: #d3d3d3;
-    font-size: 50px;
-    font-weight: 300;
-    cursor: pointer;
-    transition: color 0.3s;
-    z-index: 10;
-}
-
-.slider-btn:hover {
-    color: #888;
-}
-
-.prev-btn { left: 40px; }
-.next-btn { right: 40px; }
-
-/* =========================================
-   ABOUT SECTION (HOME)
-   ========================================= */
-.about-section {
-    position: relative;
-    overflow: hidden;
-    padding: 120px 20px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    min-height: 500px;
-}
-
-.about-img {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    height: 90%;
-    z-index: 1;
-    object-fit: contain;
-}
-
-.left-img { left: -5%; }
-.right-img { right: -5%; }
-
-.about-content {
-    position: relative;
-    z-index: 2;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.about-content h2 {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 54px;
-    font-weight: 900;
-    letter-spacing: 4px;
-    margin-bottom: 30px;
-}
-
-.about-logo-inline {
-    height: 54px;
-    width: auto;
-    margin: 0 10px;
-    object-fit: contain;
-}
-
-.about-content p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #222;
-    margin-bottom: 50px;
-}
-
-.vision-text {
-    font-size: 16px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* =========================================
-   FOOTER SECTION
-   ========================================= */
-.site-footer {
-    background-color: #1a1a1a;
-    color: #ffffff;
-    padding: 60px 20px;
-    text-align: center;
-}
-
-.footer-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 25px;
-    max-width: 800px;
-    margin: 0 auto;
-}
-
-.school-logo {
-    height: 200px;
-    width: auto;
-    object-fit: contain;
-    filter: brightness(0) invert(1);
-}
-
-.footer-text p {
-    font-size: 13px;
-    line-height: 1.6;
-    color: #888888;
-    margin-bottom: 12px;
-}
-
-/* =========================================
-   AUTHENTICATION OVERLAYS (MODAL)
-   ========================================= */
+/* — AUTH MODAL — */
 .modal-overlay {
     display: none;
     position: fixed;
@@ -326,125 +177,14 @@ body {
     color: #999;
 }
 
-/* =========================================
-   GENERATE PAGE STYLES
-   ========================================= */
-.generate-section {
-    position: relative;
-    width: 100%;
-    height: calc(100vh - 101px);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: #fff;
-}
-
-.generate-banner {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-}
-
-.create-now-btn {
-    position: absolute;
-    bottom: 25%;
-    right: 15%;
-    background-color: #222;
-    color: #fff;
-    padding: 15px 60px;
-    border: none;
-    font-weight: bold;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background 0.3s;
-}
-
-.create-now-btn:hover {
-    background-color: #000;
-}
-
-/* =========================================
-   ACCOUNT PAGE STYLES
-   ========================================= */
-.account-body {
-    background-color: #f5f5f5;
-}
-
-.account-container {
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 0 20px;
-}
-
-.account-container h1 {
-    font-size: 20px;
-    margin-bottom: 20px;
-}
-
-.account-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 25px;
-    margin-bottom: 20px;
-    border: 1px solid #e0e0e0;
-}
-
-.account-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.account-card-text h3 {
-    font-size: 16px;
-    margin-bottom: 5px;
-}
-
-.account-card-text p {
+.auth-error {
+    display: none;
+    color: #cc0000;
     font-size: 13px;
-    color: #666;
-}
-
-.account-actions {
-    display: flex;
-    gap: 15px;
-}
-
-.btn-outline {
-    border: 1px solid #000;
-    background: transparent;
-    padding: 8px 25px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-solid {
-    background-color: #000;
-    color: #fff;
-    padding: 8px 25px;
-    border-radius: 4px;
-    font-weight: bold;
-    border: 1px solid #000;
-    cursor: pointer;
-}
-
-.mix-empty-state {
-    text-align: center;
-    padding: 60px 0;
-    color: #999;
-}
-
-.mix-empty-state i {
-    font-size: 40px;
     margin-bottom: 10px;
-    color: #ccc;
 }
 
-/* =========================================
-   NOTIFICATION PANEL
-   ========================================= */
+/* — NOTIFICATION PANEL — */
 .notif-bell-wrap {
     position: relative;
 }
@@ -613,9 +353,7 @@ body {
     color: #ddd;
 }
 
-/* =========================================
-   SHARED ACTION BUTTONS
-   ========================================= */
+/* — SHARED BUTTONS — */
 .auth-primary-btn {
     background-color: #000000;
     color: #ffffff;
@@ -647,4 +385,206 @@ body {
 
 .auth-secondary-btn:hover {
     border-color: #000000;
+}
+
+/* — HAMBURGER MENU — */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    background: none;
+    border: none;
+    cursor: pointer;
+    gap: 5px;
+    padding: 5px;
+}
+
+.hamburger-btn span {
+    width: 24px;
+    height: 2.5px;
+    background-color: #000;
+    transition: all 0.3s ease;
+    border-radius: 2px;
+}
+
+.hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+/* — RESPONSIVE — */
+@media (max-width: 1024px) {
+    .navbar {
+        padding: 15px 30px;
+    }
+
+    .logo img {
+        height: 70px;
+    }
+
+    .nav-links {
+        gap: 25px;
+    }
+
+    .nav-links a {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        grid-template-columns: 1fr auto;
+        padding: 12px 20px;
+        gap: 15px;
+    }
+
+    .logo img {
+        height: 50px;
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    .nav-links {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100vh;
+        background-color: #ffffff;
+        flex-direction: column;
+        padding: 100px 30px 30px;
+        gap: 15px;
+        z-index: 999;
+        transition: left 0.3s ease;
+        border-right: 1px solid #f0f0f0;
+        overflow-y: auto;
+    }
+
+    .nav-links.active {
+        left: 0;
+    }
+
+    .nav-links a {
+        font-size: 16px;
+        padding: 15px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .nav-links a.active {
+        border-bottom: 2px solid #000;
+        padding-bottom: 13px;
+    }
+
+    .notif-panel {
+        position: fixed;
+        top: 72px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        max-width: none;
+    }
+
+    .modal-content {
+        width: 95%;
+        padding: 30px 20px;
+    }
+
+    .modal-content h2 {
+        font-size: 20px;
+    }
+
+    .modal-btn {
+        padding: 10px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar {
+        padding: 10px 15px;
+    }
+
+    .logo img {
+        height: 40px;
+    }
+
+    .nav-links {
+        padding: 80px 20px 20px;
+    }
+
+    .nav-links a {
+        font-size: 15px;
+        padding: 12px 0;
+    }
+
+    .hamburger-btn span {
+        width: 20px;
+        height: 2px;
+    }
+
+    .notif-panel {
+        top: 60px;
+        left: 10px;
+        right: 10px;
+    }
+
+    .icon-btn {
+        font-size: 18px;
+    }
+
+    .notif-badge {
+        width: 14px;
+        height: 14px;
+        font-size: 8px;
+    }
+
+    .modal-content {
+        width: 100%;
+        padding: 25px 15px;
+        border-radius: 8px;
+    }
+
+    .modal-content h2 {
+        font-size: 18px;
+    }
+
+    .input-group input {
+        padding: 10px 10px 10px 35px;
+        font-size: 13px;
+    }
+
+    .modal-btn {
+        padding: 10px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 360px) {
+    .navbar {
+        padding: 8px 10px;
+    }
+
+    .logo img {
+        height: 35px;
+    }
+
+    .nav-links {
+        padding: 70px 15px 15px;
+    }
+
+    .icon-btn {
+        font-size: 16px;
+    }
+
+    .notif-panel {
+        top: 52px;
+    }
 }

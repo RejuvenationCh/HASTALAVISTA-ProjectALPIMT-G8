@@ -144,9 +144,7 @@ function buildCalendar() {
      return String(day);
  }
 
- /* ============================================================
-    DATE UTILITIES
- ============================================================ */
+ /* — Date helpers — */
  function toDateKey(date) {
      const year = date.getFullYear();
      const month = String(date.getMonth() + 1).padStart(2, "0");

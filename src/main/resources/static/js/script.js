@@ -2,7 +2,7 @@
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ── NOTIFICATION PANEL ────────────────────────────────────────────────────
+    // — Notification panel —
     const bellBtn = document.getElementById('notif-bell-btn');
     const notifPanel = document.getElementById('notif-panel');
     const notifBadge = document.getElementById('notif-badge');
@@ -78,9 +78,35 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ========================================================
-    // 1. SLIDER LOGIC (Only runs if slider exists on the page)
-    // ========================================================
+    // — Hamburger menu toggle —
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navMenu = document.getElementById('nav-links');
+
+    if (hamburgerBtn && navMenu) {
+        hamburgerBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            hamburgerBtn.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburgerBtn.classList.remove('active');
+                navMenu.classList.remove('active');
+            });
+        });
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburgerBtn.contains(e.target) && !navMenu.contains(e.target)) {
+                hamburgerBtn.classList.remove('active');
+                navMenu.classList.remove('active');
+            }
+        });
+    }
+
+    // — Slider —
 
     const slidesWrapper = document.querySelector('.slides-wrapper');
     if (slidesWrapper) {
@@ -126,9 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startAutoSlide();
     }
 
-    // ========================================================
-    // 2. MODAL (OVERLAY) LOGIC
-    // ========================================================
+    // — Auth modal —
     const modalOverlay = document.getElementById('auth-modal');
     const loginForm = document.getElementById('login-form-container');
     const signupForm = document.getElementById('signup-form-container');
@@ -151,19 +175,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Make navbar links trigger the modal automatically (except links meant to go to real pages)
-    const navLinks = document.querySelectorAll('.nav-links a');
-    navLinks.forEach(link => {
-        if (link.getAttribute('href') === '#') {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                openModal('login');
-            });
-        }
-    });
-
-    // Attach click events to any explicit elements with the .auth-trigger class
-    // Reads data-modal="signup" to open signup view, defaults to login
+    // Open the auth modal from any element with the .auth-trigger class.
+    // Reads data-modal="signup" to open the signup view, defaults to login.
     authTriggers.forEach(trigger => {
         trigger.addEventListener('click', (e) => {
             e.preventDefault();
@@ -202,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── LOGIN submit ──────────────────────────────────────────────────────────
+    // — Login submit —
     const loginSubmitBtn = document.getElementById('login-submit-btn');
     const loginErrorEl = document.getElementById('login-error');
 
@@ -218,7 +231,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             loginErrorEl.style.display = 'none';
-            loginSubmitBtn.textContent = 'Logging in…';
+            loginSubmitBtn.textContent = 'Logging in...';
             loginSubmitBtn.disabled = true;
 
             try {
@@ -243,7 +256,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ── SIGNUP submit ─────────────────────────────────────────────────────────
+    // — Signup submit —
     const signupSubmitBtn = document.getElementById('signup-submit-btn');
     const signupErrorEl = document.getElementById('signup-error');
 
@@ -260,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             signupErrorEl.style.display = 'none';
-            signupSubmitBtn.textContent = 'Creating account…';
+            signupSubmitBtn.textContent = 'Creating account...';
             signupSubmitBtn.disabled = true;
 
             try {
@@ -274,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 modalOverlay.style.display = 'none';
 
-                // New users go to wardrobe — tutorial modal will be handled there later
+                // New users go to wardrobe; tutorial modal handled there later
                 window.location.href = '/wardrobe';
             } catch (err) {
                 signupErrorEl.textContent = err.message;
@@ -285,152 +298,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
-
-// Wardrobe Javascript — superseded by clothing.js. Disabled to avoid double handlers.
-if (false) {
-
-    const wardrobeGrid = document.getElementById('wardrobe-grid');
-    const emptyState = document.getElementById('empty-state');
-    const filterTabs = document.querySelectorAll('.filter-tab');
-
-    // Modal Overlay Elements
-    const addItemModal = document.getElementById('add-item-modal');
-    const openModalBtn = document.getElementById('open-add-modal-btn');
-    const closeModalX = document.getElementById('close-add-modal-btn');
-    const cancelModalBtn = document.getElementById('cancel-modal-btn');
-
-    // Form & Upload Elements
-    const addClothingForm = document.getElementById('add-clothing-form');
-    const dropzoneArea = document.getElementById('dropzone-area');
-    const clothingFileInput = document.getElementById('clothing-file-input');
-    const dropzoneText = document.getElementById('dropzone-text');
-    const uploadPreviewImg = document.getElementById('upload-preview-img');
-
-    // App State Variables
-    let wardrobeData = [];
-    let activeFilter = 'all';
-
-    // Modal Open/Close Controls
-    const openModal = () => {
-        if (addItemModal) {
-            addItemModal.classList.add('active');
-        }
-    };
-
-    const closeModal = () => {
-        if (addItemModal) {
-            addItemModal.classList.remove('active');
-        }
-        if (addClothingForm) addClothingForm.reset();
-        resetUploaderPreview();
-    };
-
-    if (openModalBtn) openModalBtn.addEventListener('click', openModal);
-    if (closeModalX) closeModalX.addEventListener('click', closeModal);
-    if (cancelModalBtn) cancelModalBtn.addEventListener('click', closeModal);
-
-    if (addItemModal) {
-        addItemModal.addEventListener('click', (e) => {
-            if (e.target === addItemModal) closeModal();
-        });
-    }
-
-    // Image Uploader Dynamic Preview Engine
-    if (dropzoneArea && clothingFileInput) {
-        dropzoneArea.addEventListener('click', () => clothingFileInput.click());
-
-        clothingFileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const tempObjectURL = URL.createObjectURL(file);
-                displayUploadedPreview(tempObjectURL);
-            }
-        });
-    }
-
-    const displayUploadedPreview = (srcUrl) => {
-        if (uploadPreviewImg && dropzoneText) {
-            uploadPreviewImg.src = srcUrl;
-            uploadPreviewImg.classList.remove('upload-preview-hidden');
-            dropzoneText.style.opacity = '0';
-        }
-    };
-
-    const resetUploaderPreview = () => {
-        if (uploadPreviewImg && dropzoneText) {
-            uploadPreviewImg.src = "";
-            uploadPreviewImg.classList.add('upload-preview-hidden');
-            dropzoneText.style.opacity = '1';
-        }
-    };
-
-    // Form Submit Action Handler
-    if (addClothingForm) {
-        addClothingForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-
-            const newItem = {
-                id: 'item_' + Date.now(),
-                name: document.getElementById('item-name').value.trim(),
-                category: document.getElementById('item-category').value,
-                color: document.getElementById('item-color').value.trim(),
-                imageSrc: uploadPreviewImg ? uploadPreviewImg.src : ""
-            };
-
-            wardrobeData.push(newItem);
-            renderWardrobeGrid();
-            closeModal();
-        });
-    }
-
-    // Deletion Handler
-    window.deleteWardrobeItem = (itemId) => {
-        wardrobeData = wardrobeData.filter(item => item.id !== itemId);
-        renderWardrobeGrid();
-    };
-
-    // UI Grid Rendering Engine
-    const renderWardrobeGrid = () => {
-        if (!wardrobeGrid) return;
-        const cards = wardrobeGrid.querySelectorAll('.clothing-card');
-        cards.forEach(card => card.remove());
-
-        const filteredItems = wardrobeData.filter(item => {
-            if (activeFilter === 'all') return true;
-            return item.category === activeFilter;
-        });
-
-        if (emptyState) {
-            emptyState.style.display = filteredItems.length === 0 ? 'block' : 'none';
-        }
-
-        filteredItems.forEach(item => {
-            const cardEl = document.createElement('div');
-            cardEl.classList.add('clothing-card');
-            cardEl.setAttribute('data-id', item.id);
-            cardEl.innerHTML = `
-                    <div class="card-image-wrap">
-                        <button class="delete-item-badge-btn" onclick="deleteWardrobeItem('${item.id}')" title="Delete Item">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
-                        <img src="${item.imageSrc}" alt="${item.name}">
-                    </div>
-                    <div class="card-details">
-                        <span class="item-tag">${item.category}</span>
-                        <h3>${item.name}</h3>
-                        <p class="item-meta-color">${item.color}</p>
-                    </div>
-                `;
-            wardrobeGrid.appendChild(cardEl);
-        });
-        filterTabs.forEach(tab => {
-            tab.addEventListener('click', (e) => {
-                filterTabs.forEach(t => t.classList.remove('active'));
-                e.target.classList.add('active');
-
-                activeFilter = e.target.getAttribute('data-category');
-                renderWardrobeGrid();
-            });
-        });
-    }
-};

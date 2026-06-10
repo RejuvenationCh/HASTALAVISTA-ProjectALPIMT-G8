@@ -5,7 +5,7 @@
 
 const BASE_URL = 'http://localhost:8080';
 
-// ── Token helpers ─────────────────────────────────────────────────────────────
+// — Token helpers —
 const getToken   = ()  => localStorage.getItem('outfix_token');
 const setToken   = (t) => localStorage.setItem('outfix_token', t);
 const clearToken = ()  => localStorage.removeItem('outfix_token');
@@ -55,7 +55,7 @@ function toClothingItem(c) {
     };
 }
 
-// ── AuthService ───────────────────────────────────────────────────────────────
+// — AuthService —
 const AuthService = {
 
     /** POST /api/auth/login  { email, password } */
@@ -94,7 +94,7 @@ const AuthService = {
     isLoggedIn:    () => !!getToken()
 };
 
-// ── UserService ───────────────────────────────────────────────────────────────
+// — UserService —
 const UserService = {
 
     /** GET /api/users/me → { id, username, email, faceModelUrl, finishedTutorial } */
@@ -111,7 +111,7 @@ const UserService = {
     }
 };
 
-// ── TagService ────────────────────────────────────────────────────────────────
+// — TagService —
 // The API returns a flat string array; wrap it into { categories, conditions }.
 const _CONDITIONS = ['New', 'Like New', 'Good', 'Fair', 'Worn'];
 
@@ -123,7 +123,7 @@ const TagService = {
     }
 };
 
-// ── ClothingService (individual garments → /api/clothing) ─────────────────────
+// — ClothingService (individual garments → /api/clothing) —
 const ClothingService = {
 
     /** GET /api/clothing */
@@ -149,7 +149,7 @@ const ClothingService = {
     toggleFavorite: async (id) => toClothingItem(await request('PATCH', `/api/clothing/${id}/favorite`))
 };
 
-// ── OutfitService (generated outfits → /api/wardrobes) ────────────────────────
+// — OutfitService (generated outfits → /api/wardrobes) —
 const OutfitService = {
 
     /** GET /api/wardrobes */
@@ -169,7 +169,7 @@ const OutfitService = {
     toggleFavorite: async (id) => request('PATCH', `/api/wardrobes/${id}/favorite`)
 };
 
-// ── AgendaService (schedules → /api/schedules) ────────────────────────────────
+// — AgendaService (schedules → /api/schedules) —
 const AgendaService = {
 
     /** GET /api/schedules */
@@ -189,7 +189,7 @@ const AgendaService = {
         request('GET', `/api/recommendation/${scheduleId}/outfit`)
 };
 
-// ── NotificationService (client-side, localStorage-backed) ────────────────────
+// — NotificationService (client-side, localStorage-backed) —
 const NotificationService = {
 
     _key: 'outfix_notifications',

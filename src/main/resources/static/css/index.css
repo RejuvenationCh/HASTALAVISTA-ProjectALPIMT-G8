@@ -1,0 +1,252 @@
+/* index.css — styles exclusive to index.html (home: slider, about, footer) */
+
+/* — SLIDER — */
+.slider-container {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 101px);
+    overflow: hidden;
+    background-color: #fff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.slides-wrapper {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s ease-in-out;
+}
+
+.slide {
+    min-width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.full-slide-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: center;
+}
+
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    color: #d3d3d3;
+    font-size: 50px;
+    font-weight: 300;
+    cursor: pointer;
+    transition: color 0.3s;
+    z-index: 10;
+}
+
+.slider-btn:hover {
+    color: #888;
+}
+
+.prev-btn { left: 40px; }
+.next-btn { right: 40px; }
+
+/* — ABOUT — */
+.about-section {
+    position: relative;
+    overflow: hidden;
+    padding: 120px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 500px;
+}
+
+.about-img {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 90%;
+    z-index: 1;
+    object-fit: contain;
+}
+
+.left-img { left: -5%; }
+.right-img { right: -5%; }
+
+.about-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.about-content h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 54px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    margin-bottom: 30px;
+}
+
+.about-logo-inline {
+    height: 54px;
+    width: auto;
+    margin: 0 10px;
+    object-fit: contain;
+}
+
+.about-content p {
+    font-size: 16px;
+    line-height: 1.6;
+    color: #222;
+    margin-bottom: 50px;
+}
+
+.vision-text {
+    font-size: 16px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* — FOOTER — */
+.site-footer {
+    background-color: #1a1a1a;
+    color: #ffffff;
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.school-logo {
+    height: 200px;
+    width: auto;
+    object-fit: contain;
+    filter: brightness(0) invert(1);
+}
+
+.footer-text p {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #888888;
+    margin-bottom: 12px;
+}
+
+/* — RESPONSIVE — */
+@media (max-width: 768px) {
+    .slider-container {
+        height: calc(100vh - 80px);
+    }
+
+    .prev-btn, .next-btn {
+        font-size: 35px;
+    }
+
+    .prev-btn { left: 20px; }
+    .next-btn { right: 20px; }
+
+    .about-section {
+        padding: 60px 15px;
+        min-height: auto;
+    }
+
+    .left-img, .right-img {
+        display: none;
+    }
+
+    .about-content h2 {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+
+    .about-logo-inline {
+        height: 32px;
+    }
+
+    .about-content p {
+        font-size: 14px;
+        margin-bottom: 30px;
+    }
+
+    .vision-text {
+        font-size: 14px;
+    }
+
+    .site-footer {
+        padding: 40px 15px;
+    }
+
+    .school-logo {
+        height: 120px;
+    }
+
+    .footer-text p {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .slider-container {
+        height: calc(100vh - 70px);
+    }
+
+    .prev-btn, .next-btn {
+        font-size: 24px;
+    }
+
+    .prev-btn { left: 10px; }
+    .next-btn { right: 10px; }
+
+    .about-section {
+        padding: 40px 10px;
+    }
+
+    .about-content h2 {
+        font-size: 24px;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .about-logo-inline {
+        height: 24px;
+        margin: 0 5px;
+    }
+
+    .about-content p {
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .site-footer {
+        padding: 30px 10px;
+    }
+
+    .footer-text p {
+        font-size: 11px;
+        margin-bottom: 8px;
+    }
+}
+
+@media (max-width: 360px) {
+    .about-content h2 {
+        font-size: 20px;
+    }
+
+    .about-logo-inline {
+        height: 20px;
+    }
+}

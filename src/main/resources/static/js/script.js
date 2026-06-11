@@ -173,6 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
             signupForm.style.display = 'block';
             loginForm.style.display = 'none';
         }
+        // Re-check field validity (e.g. after browser autofill) so the button colour is correct
+        refreshLoginButton();
+        refreshSignupButton();
     };
 
     // Open the auth modal from any element with the .auth-trigger class.
@@ -224,12 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
-            if (!email || !password) {
-                loginErrorEl.textContent = 'Please enter your email and password.';
-                loginErrorEl.style.display = 'block';
-                return;
-            }
-
             loginErrorEl.style.display = 'none';
             loginSubmitBtn.textContent = 'Logging in...';
             loginSubmitBtn.disabled = true;
@@ -266,12 +263,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value.trim();
 
-            if (!name || !email || !password) {
-                signupErrorEl.textContent = 'Please fill in all fields.';
-                signupErrorEl.style.display = 'block';
-                return;
-            }
-
             signupErrorEl.style.display = 'none';
             signupSubmitBtn.textContent = 'Creating account...';
             signupSubmitBtn.disabled = true;
@@ -297,4 +288,42 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // — Enable the submit buttons only when their fields are valid —
+    // The button stays grey + disabled until the form is fillable, then turns black.
+    const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    // Mirrors the backend constraints: register needs a name, a valid email and a
+    // password; login needs a valid email and a password.
+    function refreshLoginButton() {
+        if (!loginSubmitBtn) return;
+        const ready =
+            EMAIL_RE.test(document.getElementById('login-email').value.trim()) &&
+            document.getElementById('login-password').value.trim() !== '';
+        loginSubmitBtn.classList.toggle('ready', ready);
+        loginSubmitBtn.disabled = !ready;
+    }
+
+    function refreshSignupButton() {
+        if (!signupSubmitBtn) return;
+        const ready =
+            document.getElementById('signup-name').value.trim() !== '' &&
+            EMAIL_RE.test(document.getElementById('signup-email').value.trim()) &&
+            document.getElementById('signup-password').value.trim() !== '';
+        signupSubmitBtn.classList.toggle('ready', ready);
+        signupSubmitBtn.disabled = !ready;
+    }
+
+    ['login-email', 'login-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', refreshLoginButton);
+    });
+    ['signup-name', 'signup-email', 'signup-password'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', refreshSignupButton);
+    });
+
+    // Set the correct initial state on page load (fields start empty → grey + disabled)
+    refreshLoginButton();
+    refreshSignupButton();
 });

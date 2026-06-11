@@ -210,12 +210,19 @@ body {
     border: none;
     border-radius: 8px;
     font-weight: bold;
-    cursor: pointer;
+    cursor: not-allowed;
     margin-top: 10px;
+    transition: background-color 0.2s ease;
 }
 
-.modal-btn:hover {
-    background-color: #999;
+/* Turns black + clickable once every field is filled in correctly (toggled by script.js) */
+.modal-btn.ready {
+    background-color: #000;
+    cursor: pointer;
+}
+
+.modal-btn.ready:hover {
+    background-color: #333;
 }
 
 .toggle-auth {

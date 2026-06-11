@@ -26,10 +26,13 @@ public class WardrobeMockupGenerator {
     private final ComfyUiService comfyUiService;
 
     @Async
-    public void generate(Long wardrobeId, User owner) {
+    public void generate(Long wardrobeId, User owner, String tempFaceComfyFilename) {
         Wardrobe wardrobe = wardrobeRepository.findById(wardrobeId).orElseThrow();
         try {
-            String faceComfyName   = upload(owner.getFaceModelUrl());
+            // Use the one-time temp face if provided, otherwise upload the saved profile face.
+            String faceComfyName = (tempFaceComfyFilename != null && !tempFaceComfyFilename.isBlank())
+                    ? tempFaceComfyFilename
+                    : upload(owner.getFaceModelUrl());
             String topComfyName    = upload(wardrobe.getTopClothing().getClothingImageUrl());
             String bottomComfyName = upload(wardrobe.getBottomClothing().getClothingImageUrl());
 

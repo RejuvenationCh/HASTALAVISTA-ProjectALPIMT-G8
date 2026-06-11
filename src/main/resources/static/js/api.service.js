@@ -178,6 +178,21 @@ const ClothingService = {
     toggleFavorite: async (id) => toClothingItem(await request('PATCH', `/api/clothing/${id}/favorite`))
 };
 
+// — MockupService (ComfyUI operations → /api/mockup) —
+const MockupService = {
+
+    /**
+     * Uploads a file to ComfyUI's input folder for a one-time session use.
+     * Returns { name: "comfyui-filename.jpg" }.
+     * Does NOT overwrite the user's saved face model.
+     */
+    uploadTempFace: async (file) => {
+        const fd = new FormData();
+        fd.append('image', file);
+        return upload('POST', '/api/mockup/upload', fd);
+    }
+};
+
 // — OutfitService (generated outfits → /api/wardrobes) —
 const OutfitService = {
 
@@ -187,9 +202,12 @@ const OutfitService = {
     /** GET /api/wardrobes/{id} */
     getItem: async (id) => request('GET', `/api/wardrobes/${id}`),
 
-    /** POST /api/wardrobes  { scheduleId, topClothingId, bottomClothingId } */
-    create: async ({ scheduleId, topClothingId, bottomClothingId }) =>
-        request('POST', '/api/wardrobes', { scheduleId, topClothingId, bottomClothingId }),
+    /** POST /api/wardrobes  { scheduleId, topClothingId, bottomClothingId, tempFaceComfyFilename? } */
+    create: async ({ scheduleId, topClothingId, bottomClothingId, tempFaceComfyFilename }) =>
+        request('POST', '/api/wardrobes', {
+            scheduleId, topClothingId, bottomClothingId,
+            tempFaceComfyFilename: tempFaceComfyFilename || null
+        }),
 
     /** DELETE /api/wardrobes/{id} */
     deleteItem: async (id) => request('DELETE', `/api/wardrobes/${id}`),

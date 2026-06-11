@@ -13,4 +13,7 @@ public class CreateWardrobeRequestDto {
     private Long topClothingId;
     private Long bottomClothingId;
     private Long shoesClothingId;
+
+    /** ComfyUI filename of a one-time face photo. When set, overrides the user's saved face model for this generation only. */
+    private String tempFaceComfyFilename;
 }

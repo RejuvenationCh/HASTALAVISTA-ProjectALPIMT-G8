@@ -10,6 +10,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const faceOkImg    = document.getElementById('face-ok-img');
     const faceFileIn   = document.getElementById('face-file-input');
     const faceUploadBt = document.getElementById('face-upload-btn');
+    const faceChangeBtn   = document.getElementById('face-change-btn');
+    const faceChangeInput = document.getElementById('face-change-input');
+    const faceTempBadge   = document.getElementById('face-temp-badge');
+    const faceOkSub       = document.getElementById('face-ok-sub');
+    const faceResetBtn    = document.getElementById('face-reset-btn');
 
     const eventSelect  = document.getElementById('event-select');
     const recommendBt  = document.getElementById('recommend-btn');
@@ -22,8 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const mockupResult = document.getElementById('mockup-result');
 
     let hasFace   = false;
-    let currentReco = null;   // { top, bottom }
+    let currentReco = null;          // { top, bottom }
     let pollTimer = null;
+    let tempFaceComfyFilename = null; // set when user picks a one-time face override
+    let profileFaceUrl = null;        // saved so we can restore it on reset
 
     init();
 
@@ -38,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const me = await UserService.getMe();
             if (me && me.faceModelUrl) {
                 hasFace = true;
+                profileFaceUrl = me.faceModelUrl;
                 faceOkImg.src = me.faceModelUrl;
                 faceOk.style.display = 'flex';
                 facePrompt.style.display = 'none';
@@ -51,6 +59,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         refreshGenerateEnabled();
     }
+
+    // — Temp face: Change button opens the file picker —
+    faceChangeBtn.addEventListener('click', () => faceChangeInput.click());
+
+    faceChangeInput.addEventListener('change', async () => {
+        const file = faceChangeInput.files[0];
+        if (!file) return;
+
+        faceChangeBtn.disabled = true;
+        faceChangeBtn.innerHTML = '<span class="spinner"></span> Uploading…';
+        try {
+            const res = await MockupService.uploadTempFace(file);
+            tempFaceComfyFilename = res.name;
+
+            // Preview the new photo locally without hitting the profile endpoint
+            faceOkImg.src = URL.createObjectURL(file);
+            faceTempBadge.style.display = 'inline-block';
+            faceOkSub.textContent = 'Temporary photo — only used for this generation.';
+            faceOkSub.style.color = '#b8860b';
+            faceResetBtn.style.display = 'inline-flex';
+            hasFace = true;
+            refreshGenerateEnabled();
+        } catch (err) {
+            alert('Upload failed: ' + err.message);
+        } finally {
+            faceChangeBtn.disabled = false;
+            faceChangeBtn.innerHTML = '<i class="fa-solid fa-arrows-rotate"></i> Change';
+            faceChangeInput.value = '';
+        }
+    });
+
+    // — Reset: discard the temp face and go back to the saved profile photo —
+    faceResetBtn.addEventListener('click', () => {
+        tempFaceComfyFilename = null;
+        faceOkImg.src = profileFaceUrl;
+        faceTempBadge.style.display = 'none';
+        faceOkSub.textContent = 'You\'re all set to generate.';
+        faceOkSub.style.color = '#888';
+        faceResetBtn.style.display = 'none';
+    });
 
     faceUploadBt.addEventListener('click', async () => {
         const file = faceFileIn.files[0];
@@ -154,9 +202,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             const created = await OutfitService.create({
-                scheduleId:       Number(eventSelect.value),
-                topClothingId:    currentReco.top.id,
-                bottomClothingId: currentReco.bottom.id
+                scheduleId:            Number(eventSelect.value),
+                topClothingId:         currentReco.top.id,
+                bottomClothingId:      currentReco.bottom.id,
+                tempFaceComfyFilename: tempFaceComfyFilename
             });
             resultStep.style.display = 'block';
             mockupResult.innerHTML = `<p class="status-line"><span class="spinner"></span> Generating your mockup… this can take a minute.</p>`;

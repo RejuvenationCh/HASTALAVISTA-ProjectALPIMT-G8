@@ -9,6 +9,9 @@
 .face-prompt i { font-size:24px; color:#b8860b; }
 .face-ok { display:flex; gap:14px; align-items:center; }
 .face-ok img { width:64px; height:88px; object-fit:cover; border-radius:8px; }
+.btn-ghost { background:transparent; color:#555; border:1px solid #ddd; font-size:13px; padding:7px 12px; }
+.btn-ghost:hover { background:#f5f5f5; }
+.face-temp-badge { display:inline-block; margin-top:5px; font-size:12px; color:#b8860b; background:#fff7e6; border:1px solid #ffe0a3; border-radius:5px; padding:2px 8px; }
 select, input[type=file] { width:100%; padding:10px; border:1px solid #ddd; border-radius:8px; font-size:14px; }
 .btn { display:inline-flex; align-items:center; gap:8px; border:none; border-radius:8px; padding:11px 18px; font-weight:600; cursor:pointer; }
 .btn-dark { background:#111; color:#fff; }

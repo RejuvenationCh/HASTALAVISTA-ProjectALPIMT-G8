@@ -48,11 +48,14 @@ public class WardrobeService {
                 .build());
 
         // Top + pants only — shoes are optional and ignored by generation.
-        boolean canGenerate = owner.getFaceModelUrl() != null
-                && top != null && bottom != null;
+        // A temp face uploaded just for this session counts as a valid face source.
+        String tempFace = request.getTempFaceComfyFilename();
+        boolean hasFace = owner.getFaceModelUrl() != null
+                || (tempFace != null && !tempFace.isBlank());
+        boolean canGenerate = hasFace && top != null && bottom != null;
 
         if (canGenerate) {
-            mockupGenerator.generate(wardrobe.getId(), owner);
+            mockupGenerator.generate(wardrobe.getId(), owner, tempFace);
         }
 
         return wardrobe;

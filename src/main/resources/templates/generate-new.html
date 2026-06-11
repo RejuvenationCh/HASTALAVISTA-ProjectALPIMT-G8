@@ -58,9 +58,19 @@
 
             <div id="face-ok" class="face-ok" style="display:none;">
                 <img id="face-ok-img" src="" alt="Your Face ID">
-                <div>
+                <div style="flex:1;">
                     <strong>Face ID ready.</strong>
-                    <p style="margin:4px 0 0; font-size:13px; color:#888;">You're all set to generate.</p>
+                    <div id="face-temp-badge" class="face-temp-badge" style="display:none;">Temporary photo active</div>
+                    <p id="face-ok-sub" style="margin:4px 0 0; font-size:13px; color:#888;">You're all set to generate.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                    <input type="file" id="face-change-input" accept="image/*" style="display:none;">
+                    <button class="btn btn-ghost" id="face-change-btn">
+                        <i class="fa-solid fa-arrows-rotate"></i> Change
+                    </button>
+                    <button class="btn btn-ghost" id="face-reset-btn" style="display:none; color:#999;">
+                        Reset to profile
+                    </button>
                 </div>
             </div>
         </section>

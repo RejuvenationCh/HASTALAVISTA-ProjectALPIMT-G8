@@ -21,13 +21,22 @@ main {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px;
+    margin-bottom: 28px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--black);
 }
 
 .schedule-page-title {
-    font-size: 22px;
-    font-weight: 800;
-    letter-spacing: -0.3px;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+}
+
+.schedule-page-subtitle {
+    font-size: 13px;
+    color: var(--grey-mid);
+    margin-top: 4px;
+    font-weight: 400;
 }
 
 .btn-add-event-top {
@@ -46,12 +55,6 @@ main {
 
 .btn-add-event-top:hover {
     text-decoration: underline;
-}
-
-.schedule-page-divider {
-    border: none;
-    border-top: 2.5px solid var(--black);
-    margin-bottom: 28px;
 }
 
 /* — CALENDAR — */
@@ -236,9 +239,10 @@ main {
 
 /* ---- Event Card ---- */
 .event-card {
+    position: relative;
     border: 1px solid var(--grey-border);
     border-radius: var(--radius-card);
-    padding: 16px;
+    padding: 16px 48px 16px 16px;
     display: flex;
     gap: 16px;
     align-items: flex-start;
@@ -247,6 +251,30 @@ main {
 
 .event-card:last-child {
     margin-bottom: 0;
+}
+
+/* Delete button pinned to the top-right corner of the card */
+.event-del-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: none;
+    border-radius: 6px;
+    color: var(--grey-mid);
+    font-size: 15px;
+    cursor: pointer;
+    transition: color 0.15s, background 0.15s;
+}
+
+.event-del-btn:hover {
+    color: var(--red-sunday);
+    background: #f5f5f5;
 }
 
 .event-card-info .event-name {
@@ -385,7 +413,8 @@ main {
     }
 
     .schedule-page-title {
-        font-size: 20px;
+        font-size: 24px;
+        letter-spacing: 1px;
     }
 
     .btn-add-event-top {
@@ -407,7 +436,7 @@ main {
 
     .event-card {
         gap: 12px;
-        padding: 12px;
+        padding: 12px 46px 12px 12px;
     }
 
     .event-card-info .event-name {
@@ -444,19 +473,20 @@ main {
     }
 
     .schedule-page-header {
-        margin-bottom: 12px;
+        margin-bottom: 18px;
+        padding-bottom: 16px;
     }
 
     .schedule-page-title {
-        font-size: 18px;
+        font-size: 22px;
+    }
+
+    .schedule-page-subtitle {
+        font-size: 12px;
     }
 
     .btn-add-event-top {
         font-size: 13px;
-    }
-
-    .schedule-page-divider {
-        margin-bottom: 18px;
     }
 
     .calendar-month-label {
@@ -506,7 +536,7 @@ main {
 
     .event-card {
         gap: 10px;
-        padding: 10px;
+        padding: 10px 44px 10px 10px;
         margin-bottom: 10px;
         flex-direction: column;
         align-items: flex-start;
@@ -566,7 +596,7 @@ main {
     }
 
     .schedule-page-title {
-        font-size: 16px;
+        font-size: 20px;
     }
 
     .calendar-month-label {

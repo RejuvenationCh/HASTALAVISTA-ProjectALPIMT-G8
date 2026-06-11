@@ -1,5 +1,5 @@
  // Populated from the backend (GET /api/schedules) by loadSchedulesFromBackend().
- // Shape: { "yyyy-mm-dd": [ { id, name, date, category, targetToken } ] }
+ // Shape: { "yyyy-mm-dd": [ { id, name, date, category } ] }
  let eventStore = {};
 
 flatpickr("#inputDate", {
@@ -19,8 +19,7 @@ async function loadSchedulesFromBackend() {
                 id: s.id,
                 name: s.activityName,
                 date: toDisplayDate(key),
-                category: s.targetTag,
-                targetToken: s.targetToken
+                category: s.targetTag
             });
         });
         rebuildCalendarDayCells();
@@ -118,10 +117,8 @@ function buildCalendar() {
             cell.appendChild(badge);
         }
 
-        const capturedDateKey = dateKey;
-
         cell.addEventListener("click", function () {
-            openEventListModal(capturedDateKey);
+            openEventListModal(dateKey);
         });
 
         grid.appendChild(cell);
@@ -209,9 +206,27 @@ function buildCalendar() {
             <div class="event-date-display">${escapeHtml(event.date)}</div>
             <span class="category-pill">${escapeHtml(event.category)}</span>
           </div>
+          <button class="event-del-btn" title="Delete event" aria-label="Delete event">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         `;
+         card.querySelector(".event-del-btn").addEventListener("click", function () {
+             deleteEvent(event.id);
+         });
          eventListBody.appendChild(card);
      });
+ }
+
+ async function deleteEvent(id) {
+     if (!confirm("Delete this event?")) return;
+     try {
+         await AgendaService.deleteAgenda(id);
+         await loadSchedulesFromBackend();
+         // Refresh the open list (shows the empty state if it was the last event)
+         renderEventList(currentSelectedDate);
+     } catch (err) {
+         alert("Could not delete event: " + err.message);
+     }
  }
 
  function openAddEventModal(dateKey) {
@@ -244,7 +259,13 @@ function buildCalendar() {
      }
  });
 
+ // Guards against duplicate events when the Add button is spam-clicked:
+ // a second call is ignored while the first request is still in flight.
+ let isSubmittingEvent = false;
+
  async function submitAddEvent() {
+     if (isSubmittingEvent) return;
+
      const name = document.getElementById("inputName").value.trim();
      const category = document.getElementById("inputCategory").value;
      const dateKey = document.getElementById("inputDate").value;
@@ -267,6 +288,13 @@ function buildCalendar() {
          return;
      }
 
+     const submitBtn = document.querySelector(".btn-submit-event");
+     isSubmittingEvent = true;
+     if (submitBtn) {
+         submitBtn.disabled = true;
+         submitBtn.textContent = "Adding…";
+     }
+
      try {
          await AgendaService.addAgenda({
              activityName: name,
@@ -278,6 +306,12 @@ function buildCalendar() {
          await loadSchedulesFromBackend();
      } catch (err) {
          alert("Could not save event: " + err.message);
+     } finally {
+         isSubmittingEvent = false;
+         if (submitBtn) {
+             submitBtn.disabled = false;
+             submitBtn.textContent = "Add";
+         }
      }
  }
 

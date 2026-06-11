@@ -1,9 +1,9 @@
 /* wardrobe-outfits.css — styles exclusive to wardrobe.html (outfit table) */
 
 .outfit-table-wrap { padding: 32px 48px; }
-.outfit-table-head { display:flex; justify-content:space-between; align-items:flex-end; margin-bottom:24px; }
-.outfit-table-head h1 { margin:0; }
-.outfit-table-head p { color:#777; margin:4px 0 0; }
+.outfit-table-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:36px; padding-bottom:20px; border-bottom:2px solid #000; }
+.outfit-table-head h1 { margin:0; font-size:32px; font-weight:900; letter-spacing:2px; }
+.outfit-table-head p { font-size:13px; color:#888; margin:4px 0 0; }
 .outfit-table { width:100%; border-collapse:collapse; background:#fff; }
 .outfit-table th, .outfit-table td { padding:14px 16px; text-align:left; border-bottom:1px solid #eee; vertical-align:middle; }
 .outfit-table th { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:#999; }
@@ -21,7 +21,8 @@
 /* — RESPONSIVE — */
 @media (max-width: 768px) {
     .outfit-table-wrap { padding: 24px 16px; }
-    .outfit-table-head { flex-direction: column; align-items: flex-start; gap: 12px; }
+    .outfit-table-head { flex-direction: column; align-items: flex-start; gap: 15px; margin-bottom: 24px; }
+    .outfit-table-head h1 { font-size: 24px; letter-spacing: 1px; }
 
     /* Let the wide table scroll horizontally instead of breaking the layout */
     .outfit-table-wrap { overflow-x: auto; }
@@ -32,5 +33,7 @@
 
 @media (max-width: 480px) {
     .outfit-table-wrap { padding: 18px 12px; }
+    .outfit-table-head h1 { font-size: 20px; }
+    .outfit-table-head p { font-size: 12px; }
     .outfit-table th, .outfit-table td { padding: 10px; font-size: 12px; }
 }

@@ -383,6 +383,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // — SUBMIT STATE HELPERS —
+    // Re-entry guard so spam-clicking (or holding Enter) can't add the same item twice.
+    let isSubmitting = false;
     function setSubmitPending() { submitBtn.disabled = true;  submitBtn.innerHTML = '<span class="btn-spinner"></span> SAVING...'; }
     function setSubmitIdle()    { submitBtn.disabled = false; submitBtn.innerHTML = 'ADD TO CLOTHING'; }
     function setSubmitError()   { submitBtn.disabled = false; submitBtn.innerHTML = 'TRY AGAIN'; }
@@ -390,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // — FORM SUBMIT —
     addForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        if (isSubmitting) return;
 
         const name        = document.getElementById('item-name').value.trim();
         const formality   = parseInt(formalitySelect.value, 10);
@@ -402,6 +405,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (categoryEls.length === 0) { alert('Please select at least one category.'); return; }
 
         const tags = [genderEl.value, ...Array.from(categoryEls, el => el.value)];
+        isSubmitting = true;
         setSubmitPending();
 
         try {
@@ -417,6 +421,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             setSubmitError();
             alert('Failed to add item: ' + err.message);
+        } finally {
+            isSubmitting = false;
         }
     });
 });

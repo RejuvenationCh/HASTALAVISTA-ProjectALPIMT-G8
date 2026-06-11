@@ -26,8 +26,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultStep   = document.getElementById('result-step');
     const mockupResult = document.getElementById('mockup-result');
 
+    const pickerOverlay  = document.getElementById('picker-overlay');
+    const pickerTitle    = document.getElementById('picker-title');
+    const pickerGrid     = document.getElementById('picker-grid');
+    const pickerEmpty    = document.getElementById('picker-empty');
+    const pickerCloseBtn = document.getElementById('picker-close');
+
     let hasFace   = false;
     let currentReco = null;          // { top, bottom }
+    let currentOptions = null;       // { tops: [], bottoms: [] }
+    let activePickerSlot = null;     // 'top' | 'bottom'
     let pollTimer = null;
     let tempFaceComfyFilename = null; // set when user picks a one-time face override
     let profileFaceUrl = null;        // saved so we can restore it on reset
@@ -146,8 +154,13 @@ document.addEventListener('DOMContentLoaded', () => {
         recommendBt.disabled = true;
         recommendBt.innerHTML = '<span class="spinner"></span> Finding…';
         try {
-            const reco = await AgendaService.getRecommendationOutfit(scheduleId);
-            currentReco = reco;
+            // Fetch the recommendation and all available options in one round-trip
+            const [reco, options] = await Promise.all([
+                AgendaService.getRecommendationOutfit(scheduleId),
+                AgendaService.getRecommendationOptions(scheduleId)
+            ]);
+            currentReco    = reco;
+            currentOptions = options;
             renderReco(reco);
             recoStep.style.display = 'block';
             resultStep.style.display = 'none';
@@ -160,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function recoCard(label, c) {
+    function recoCard(label, c, slot) {
         if (!c) {
             return `<div class="reco-missing">
                         <i class="fa-solid fa-circle-exclamation"></i>
@@ -169,7 +182,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>`;
         }
         const tags = c.tags ? c.tags.split(',').map(t => t.trim()).join(' · ') : '';
-        return `<div class="reco-card">
+        return `<div class="reco-card" data-slot="${slot}" title="Click to change">
+                    <div class="reco-change-hint"><i class="fa-solid fa-repeat"></i> Change</div>
                     ${c.clothingImageUrl ? `<img class="reco-img" src="${c.clothingImageUrl}" alt="${label}">` : `<div class="reco-img"></div>`}
                     <div class="reco-body">
                         <span class="reco-cat">${label} · F${c.tokenFormalitas}</span>
@@ -179,8 +193,61 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderReco(reco) {
-        recoGrid.innerHTML = recoCard('Top', reco.top) + recoCard('Pants', reco.bottom);
+        recoGrid.innerHTML = recoCard('Top', reco.top, 'top') + recoCard('Pants', reco.bottom, 'bottom');
+        recoGrid.querySelectorAll('.reco-card[data-slot]').forEach(card => {
+            card.addEventListener('click', () => openPicker(card.dataset.slot));
+        });
     }
+
+    // — Swap picker —
+    function openPicker(slot) {
+        activePickerSlot = slot;
+        const isTop = slot === 'top';
+        pickerTitle.textContent = isTop ? 'Choose a Top' : 'Choose Pants';
+        const items = isTop ? currentOptions?.tops : currentOptions?.bottoms;
+
+        if (!items || items.length === 0) {
+            pickerGrid.innerHTML = '';
+            pickerEmpty.style.display = 'block';
+        } else {
+            pickerEmpty.style.display = 'none';
+            const currentId = isTop ? currentReco?.top?.id : currentReco?.bottom?.id;
+            pickerGrid.innerHTML = items.map(item => {
+                const tags = item.tags ? item.tags.split(',').map(t => t.trim()).join(' · ') : '';
+                const selected = item.id === currentId ? ' selected' : '';
+                return `<div class="picker-item${selected}" data-id="${item.id}">
+                            <img src="${item.clothingImageUrl || ''}" alt="">
+                            <div class="picker-item-body">
+                                <div class="picker-cat">F${item.tokenFormalitas}</div>
+                                <div class="picker-tags">${tags}</div>
+                            </div>
+                        </div>`;
+            }).join('');
+            pickerGrid.querySelectorAll('.picker-item').forEach((el, i) => {
+                el.addEventListener('click', () => selectItem(slot, items[i]));
+            });
+        }
+
+        pickerOverlay.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closePicker() {
+        pickerOverlay.style.display = 'none';
+        document.body.style.overflow = '';
+        activePickerSlot = null;
+    }
+
+    function selectItem(slot, item) {
+        if (slot === 'top') currentReco = { ...currentReco, top: item };
+        else                currentReco = { ...currentReco, bottom: item };
+        closePicker();
+        renderReco(currentReco);
+        refreshGenerateEnabled();
+    }
+
+    pickerCloseBtn.addEventListener('click', closePicker);
+    pickerOverlay.addEventListener('click', e => { if (e.target === pickerOverlay) closePicker(); });
 
     // — STEP 3: Generate + poll —
     function refreshGenerateEnabled() {

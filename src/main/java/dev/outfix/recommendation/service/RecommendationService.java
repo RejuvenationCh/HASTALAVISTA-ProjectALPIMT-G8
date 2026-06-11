@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import dev.outfix.clothing.dto.ClothingResponseDto;
 import dev.outfix.clothing.entity.Clothing;
 import dev.outfix.clothing.repository.ClothingRepository;
+import dev.outfix.recommendation.dto.OutfitOptionsResponseDto;
 import dev.outfix.recommendation.dto.OutfitRecommendationResponseDto;
 import dev.outfix.recommendation.dto.RecommendationResponseDto;
 import dev.outfix.schedule.entity.Schedule;
@@ -58,6 +59,20 @@ public class RecommendationService {
         ClothingResponseDto bottom = firstMatch(requestingUser, schedule, "Bottom");
 
         return OutfitRecommendationResponseDto.of(top, bottom);
+    }
+
+    /** Returns all tops and bottoms that match the schedule's formality + dresscode. */
+    public OutfitOptionsResponseDto recommendOutfitOptions(Long scheduleId, User requestingUser) {
+        Schedule schedule = scheduleService.getById(scheduleId, requestingUser);
+        List<ClothingResponseDto> tops    = allMatches(requestingUser, schedule, "Top");
+        List<ClothingResponseDto> bottoms = allMatches(requestingUser, schedule, "Bottom");
+        return new OutfitOptionsResponseDto(tops, bottoms);
+    }
+
+    private List<ClothingResponseDto> allMatches(User user, Schedule schedule, String categoryTag) {
+        return clothingRepository.findMatchingItems(
+                user, schedule.getTargetToken(), categoryTag, schedule.getDresscode())
+                .stream().map(this::toDto).toList();
     }
 
     /** Returns the first clothing item matching the schedule for the given category tag, or null. */

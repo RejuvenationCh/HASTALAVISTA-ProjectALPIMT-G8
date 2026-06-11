@@ -233,7 +233,11 @@ const AgendaService = {
 
     /** GET /api/recommendation/{scheduleId}/outfit → { status, top, bottom } */
     getRecommendationOutfit: async (scheduleId) =>
-        request('GET', `/api/recommendation/${scheduleId}/outfit`)
+        request('GET', `/api/recommendation/${scheduleId}/outfit`),
+
+    /** GET /api/recommendation/{scheduleId}/options → { tops: [...], bottoms: [...] } */
+    getRecommendationOptions: async (scheduleId) =>
+        request('GET', `/api/recommendation/${scheduleId}/options`)
 };
 
 // — NotificationService (client-side, localStorage-backed) —

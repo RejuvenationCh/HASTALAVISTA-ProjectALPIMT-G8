@@ -106,6 +106,23 @@
             <h2>4. Mockup</h2>
             <div class="mockup-result" id="mockup-result"></div>
         </section>
+        <!-- Swap picker modal -->
+        <div id="picker-overlay" class="picker-overlay" style="display:none;" role="dialog">
+            <div class="picker-modal">
+                <div class="picker-header">
+                    <h3 id="picker-title">Choose a Top</h3>
+                    <button class="picker-close" id="picker-close" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div id="picker-empty" class="picker-empty" style="display:none;">
+                    <i class="fa-solid fa-box-open"></i>
+                    <p>No matching items found for this event.</p>
+                    <a href="/clothing">Add clothing</a>
+                </div>
+                <div class="picker-grid" id="picker-grid"></div>
+            </div>
+        </div>
     </main>
 
     <script th:src="@{/js/app.state.js}"></script>
